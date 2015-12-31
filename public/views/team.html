@@ -1,0 +1,13 @@
+<div class="jumbotron text-center">
+    <h1>{{teamId}}</h1>
+    <p>Record: {{ games.record.win }} - {{ games.record.loss }} - {{ games.record.tie }} ({{winPct}})</p>
+    <p>Opponents Record: {{ games.opponentRecord.win }} - {{ games.opponentRecord.loss }} - {{ games.opponentRecord.tie }} ({{oppWinPct}})</p>
+</div>
+<table class="table gametable">
+    <tr ng-repeat="game in games.games">
+        <td><a ng-href="/team/{{game.home}}">{{game.home}}</a></td>
+        <td>{{game.homeScore}}</td>
+        <td><a ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
+        <td>{{game.visitorScore}}</td>
+    </tr>
+</table>

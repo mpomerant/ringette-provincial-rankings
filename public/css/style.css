@@ -1,0 +1,15 @@
+.sortorder:after {
+    content: '\25b2';
+}
+
+.sortorder.reverse:after {
+    content: '\25bc';
+}
+
+.centerText {
+    text-align: center;
+}
+
+.missed {
+    background-color: #ffffcc
+}
