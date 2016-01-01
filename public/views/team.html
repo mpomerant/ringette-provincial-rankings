@@ -1,13 +1,49 @@
-<div class="jumbotron text-center">
-    <h1>{{teamId}}</h1>
-    <p>Record: {{ games.record.win }} - {{ games.record.loss }} - {{ games.record.tie }} ({{winPct}})</p>
-    <p>Opponents Record: {{ games.opponentRecord.win }} - {{ games.opponentRecord.loss }} - {{ games.opponentRecord.tie }} ({{oppWinPct}})</p>
+<div class="row">
+    <div class="jumbotron text-center">
+        <h1>{{teamId}}</h1>
+        <div class="row">
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3>Record</h3>
+                        <p>{{ games.record.win }} - {{ games.record.loss }} - {{ games.record.tie }} ({{winPct}})</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3>Opponents Record</h3>
+                        <p>{{ games.opponentRecord.win }} - {{ games.opponentRecord.loss }} - {{ games.opponentRecord.tie }} ({{oppWinPct}})</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3>Goals For</h3>
+                        <p>{{games.record.for}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3>Goals Against</h3>
+                        <p>{{games.record.against}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<table class="table gametable">
-    <tr ng-repeat="game in games.games">
-        <td><a ng-href="/team/{{game.home}}">{{game.home}}</a></td>
-        <td>{{game.homeScore}}</td>
-        <td><a ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
-        <td>{{game.visitorScore}}</td>
-    </tr>
-</table>
+<div class="row">
+    <table class="table gametable">
+        <tr ng-repeat="game in games.games">
+            <td><a ng-href="/team/{{game.home}}">{{game.home}}</a></td>
+            <td>{{game.homeScore}}</td>
+            <td><a ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
+            <td>{{game.visitorScore}}</td>
+        </tr>
+    </table>
+</div>

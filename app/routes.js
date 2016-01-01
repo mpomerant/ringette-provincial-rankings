@@ -140,7 +140,9 @@ module.exports = function(app) {
                             win: myteam.win,
                             loss: myteam.loss,
                             tie: myteam.tie,
-                            pct: Number(myteam.win / (myteam.win + myteam.loss)).toFixed(3)
+                            pct: Number(myteam.win / (myteam.win + myteam.loss)).toFixed(3),
+                            for: myteam.for,
+                            against: myteam.against
                         }
                         result.opponentRecord = {
                             win: 0,
