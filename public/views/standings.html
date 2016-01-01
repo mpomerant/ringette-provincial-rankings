@@ -1,39 +1,29 @@
 <table class="table standingstable">
     <tr>
         <th class="centerText">
-            <button ng-click="order('team')" class="btn btn-info">Team</button>
-            <span class="sortorder" ng-show="predicate === 'team'" ng-class="{reverse:reverse}"></span></th>
+            Team
+            <span class="sortorder" ng-click="order('team')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            <button ng-click="order('games')" class="btn btn-info">Games</button>
-            <span class="sortorder" ng-show="predicate === 'games'" ng-class="{reverse:reverse}"></span></th>
+            Games
+            <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
+        <th class="centerText">Record</th>
         <th class="centerText">
-            <button ng-click="order('win')" class="btn btn-info">Wins</button>
-            <span class="sortorder" ng-show="predicate === 'win'" ng-class="{reverse:reverse}"></span></th>
+            Points
+            <span class="sortorder" ng-click="order('points')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            <button ng-click="order('loss')" class="btn btn-info">Losses</button>
-            <span class="sortorder" ng-show="predicate === 'loss'" ng-class="{reverse:reverse}"></span></th>
+            Win %
+            <span class="sortorder" ng-click="order('winPct')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            <button ng-click="order('tie')" class="btn btn-info">Ties</button>
-            <span class="sortorder" ng-show="predicate === 'tie'" ng-class="{reverse:reverse}"></span></th>
+            Opp Win %
+            <span class="sortorder" ng-click="order('oppWinPct')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            <button ng-click="order('points')" class="btn btn-info">Points</button>
-            <span class="sortorder" ng-show="predicate === 'points'" ng-class="{reverse:reverse}"></span></th>
-        <th class="centerText">
-            <button ng-click="order('winPct')" class="btn btn-info">Win %</button>
-            <span class="sortorder" ng-show="predicate === 'winPct'" ng-class="{reverse:reverse}"></span></th>
-        <th class="centerText">
-            <button ng-click="order('oppWinPct')" class="btn btn-info">Opp Win %</button>
-            <span class="sortorder" ng-show="predicate === 'oppWinPct'" ng-class="{reverse:reverse}"></span></th>
-        <th class="centerText">
-            <button ng-click="order('diff')" class="btn btn-info">+/-</button>
-            <span class="sortorder" ng-show="predicate === 'diff'" ng-class="{reverse:reverse}"></span></th>
+            +/-
+            <span class="sortorder" ng-click="order('diff')" ng-class="{reverse:reverse}"></span></th>
     </tr>
     <tr ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 13 && predicate === 'points' && reverse === true}">
         <td><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
         <td class="centerText">{{team.games}}</td>
-        <td class="centerText">{{team.win}}</td>
-        <td class="centerText">{{team.loss}}</td>
-        <td class="centerText">{{team.tie}}</td>
+        <td class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
         <td class="centerText">{{team.points}}</td>
         <td class="centerText">{{team.winPct}}</td>
         <td class="centerText">{{team.oppWinPct}}</td>
