@@ -16,9 +16,9 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
             $scope.standings.forEach(function(team) {
                 var teamId = team.team;
                 Game.team(teamId).success(function(data) {
-                    var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
+                    //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
                     team.oppWinPct =
-                        tournamentTeam ? Number(data.opponentRecord.win / (data.opponentRecord.win + data.opponentRecord.loss)).toFixed(3) : 0;
+                        Number(data.opponentRecord.win / (data.opponentRecord.win + data.opponentRecord.loss)).toFixed(3);
                 });
 
             });
