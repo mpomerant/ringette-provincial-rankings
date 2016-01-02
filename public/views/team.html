@@ -1,38 +1,19 @@
 <div class="row">
     <div class="jumbotron text-center">
         <h1>{{teamId}}</h1>
+        <hello data-foo="cool"></hello>
         <div class="row">
             <div class="col-xs-6 col-md-3">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <h3>Record</h3>
-                        <p>{{ games.record.win }} - {{ games.record.loss }} - {{ games.record.tie }} ({{winPct}})</p>
-                    </div>
-                </div>
+                <game-container data-title="Record" data-content="{{ games.record.win }} - {{ games.record.loss }} - {{ games.record.tie }} ({{winPct}})"></game-container>
             </div>
             <div class="col-xs-6 col-md-3">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <h3>Opponents Record</h3>
-                        <p>{{ games.opponentRecord.win }} - {{ games.opponentRecord.loss }} - {{ games.opponentRecord.tie }} ({{oppWinPct}})</p>
-                    </div>
-                </div>
+                <game-container data-title="Opponents Record" data-content="{{ games.opponentRecord.win }} - {{ games.opponentRecord.loss }} - {{ games.opponentRecord.tie }} ({{oppWinPct}})"></game-container>
             </div>
             <div class="col-xs-6 col-md-3">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <h3>Goals For</h3>
-                        <p>{{games.record.for}}</p>
-                    </div>
-                </div>
+                <game-container data-title="Goals For" data-content="{{games.record.for}}"></game-container>
             </div>
             <div class="col-xs-6 col-md-3">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <h3>Goals Against</h3>
-                        <p>{{games.record.against}}</p>
-                    </div>
-                </div>
+                <game-container data-title="Goals Against" data-content="{{games.record.against}}"></game-container>
             </div>
         </div>
     </div>
@@ -40,10 +21,10 @@
 <div class="row">
     <table class="table gametable">
         <tr ng-repeat="game in games.games">
-            <td><a ng-href="/team/{{game.home}}">{{game.home}}</a></td>
-            <td>{{game.homeScore}}</td>
-            <td><a ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
-            <td>{{game.visitorScore}}</td>
+            <td><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
+            <td style='font-size: 1.25em'>{{game.homeScore}}</td>
+            <td><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
+            <td style='font-size: 1.25em'>{{game.visitorScore}}</td>
         </tr>
     </table>
 </div>

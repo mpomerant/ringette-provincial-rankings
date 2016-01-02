@@ -1,33 +1,33 @@
 <table class="table standingstable">
     <tr>
         <th class="centerText">
-            Team
+            <span style='font-size: 1.25em'>Team</span>
             <span class="sortorder" ng-click="order('team')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            Games
+            <span style='font-size: 1.25em'>Games</span>
             <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
-        <th class="centerText">Record</th>
+        <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
         <th class="centerText">
-            Points
+            <span style='font-size: 1.25em'>Points</span>
             <span class="sortorder" ng-click="order('points')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            Win %
+            <span style='font-size: 1.25em'>Win %</span>
             <span class="sortorder" ng-click="order('winPct')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            Opp Win %
+            <span style='font-size: 1.25em'>Opp Win %</span>
             <span class="sortorder" ng-click="order('oppWinPct')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText">
-            +/-
+            <span style='font-size: 1.25em'>+/-</span>
             <span class="sortorder" ng-click="order('diff')" ng-class="{reverse:reverse}"></span></th>
     </tr>
     <tr ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 13 && predicate === 'points' && reverse === true}">
-        <td><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
-        <td class="centerText">{{team.games}}</td>
-        <td class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
-        <td class="centerText">{{team.points}}</td>
-        <td class="centerText">{{team.winPct}}</td>
-        <td class="centerText">{{team.oppWinPct}}</td>
-        <td class="centerText">{{team.diff}}</td>
+        <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
+        <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
+        <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
+        <td style='font-size: 1.25em' class="centerText">{{team.winPct}}</td>
+        <td style='font-size: 1.25em' class="centerText">{{team.oppWinPct}}</td>
+        <td style='font-size: 1.25em' class="centerText">{{team.diff}}</td>
     </tr>
 </table>
 <canvas id="bar" class="chart chart-bar" chart-data="data" chart-labels="labels" chart-series="series">

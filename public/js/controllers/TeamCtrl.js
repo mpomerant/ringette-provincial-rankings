@@ -24,4 +24,14 @@ angular.module('TeamCtrl', []).controller('TeamController', function($scope, $ro
 
 
 
+}).directive("gameContainer", function() {
+    return {
+
+        template: "<div style='background-color: blue'><h4 style='color: white'>{{title}}</h4></div><div><h3>{{content}}</h3></div>",
+        scope: {
+            title: "@title",
+            content: "@content"
+
+        }
+    };
 });
