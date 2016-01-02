@@ -1,7 +1,7 @@
 <div class="row">
     <div class="jumbotron text-center">
         <h1>{{teamId}}</h1>
-        <hello data-foo="cool"></hello>
+        <h3>Tournament</h3>
         <div class="row">
             <div class="col-xs-6 col-md-3">
                 <game-container data-title="Record" data-content="{{ games.record.win }} - {{ games.record.loss }} - {{ games.record.tie }} ({{winPct}})"></game-container>
@@ -16,15 +16,40 @@
                 <game-container data-title="Goals Against" data-content="{{games.record.against}}"></game-container>
             </div>
         </div>
+        <h3>Regular Season</h3>
+        <div class="row">
+            <div class="col-xs-6 col-md-3">
+                <game-container data-title="Record" data-content="{{ games.regularSeasonRecord.win }} - {{ games.regularSeasonRecord.loss }} - {{ games.regularSeasonRecord.tie }}"></game-container>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <game-container data-title="Goals For" data-content="{{games.regularSeasonRecord.for}}"></game-container>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <game-container data-title="Goals Against" data-content="{{games.regularSeasonRecord.against}}"></game-container>
+            </div>
+        </div>
     </div>
 </div>
 <div class="row">
+    <h2>Tournament Games Played</h2>
     <table class="table gametable">
         <tr ng-repeat="game in games.games">
-            <td><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
-            <td style='font-size: 1.25em'>{{game.homeScore}}</td>
-            <td><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
-            <td style='font-size: 1.25em'>{{game.visitorScore}}</td>
+            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
+            <td style="width: 10%" style='font-size: 1.25em'>{{game.homeScore}}</td>
+            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
+            <td style="width: 10%" style='font-size: 1.25em'>{{game.visitorScore}}</td>
+        </tr>
+    </table>
+</div>
+<br/>
+<div class="row">
+    <h2>Regular Season Played</h2>
+    <table class="table gametable">
+        <tr ng-repeat="game in games.regularSeason">
+            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
+            <td style="width: 10%" style='font-size: 1.25em'>{{game.homeScore}}</td>
+            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
+            <td style="width: 10%" style='font-size: 1.25em'>{{game.visitorScore}}</td>
         </tr>
     </table>
 </div>

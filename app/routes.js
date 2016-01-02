@@ -8,60 +8,129 @@ module.exports = function(app) {
     // handle things like api calls
     // authentication routes
 
+    var initializeTeam = function(team, sortable, matrix) {
+
+
+        var result = {
+            team: team,
+            games: 0,
+            win: 0,
+            loss: 0,
+            tie: 0,
+            points: 0,
+            for: 0,
+            against: 0,
+            diff: 0,
+            winPct: 0,
+            oppWinPct: 0,
+            regularSeason: {
+                games: 0,
+                win: 0,
+                loss: 0,
+                tie: 0,
+                points: 0,
+                for: 0,
+                against: 0,
+                diff: 0,
+                winPct: 0,
+                oppWinPct: 0
+            }
+        };
+
+        return result;
+
+
+
+
+    }
     var getTeamMatrix = function() {
         return new Promise(function(resolve, reject) {
             var matrix = {};
             var sortable = [];
             var allGames = [];
+            var regularSeasonGames = [];
             Game.find().exec().then(function(games) {
+                var playoff = games.filter(function(game) {
+                    return game.type !== 'RS';
+                });
+                var regular = games.filter(function(game) {
+                    return game.type === 'RS';
+                });
+                allGames = playoff;
+                regularSeasonGames = regular;
 
-                allGames = games;
-                games.forEach(function(result) {
+                regular.forEach(function(regularGame) {
+
+                    var team1 = regularGame.home;
+                    var team1Goals = Number(regularGame.homeScore);
+                    var team2 = regularGame.visitor;
+                    var team2Goals = Number(regularGame.visitorScore);
+                    if (!matrix[team1]) {
+                        var team1Init = initializeTeam(team1);
+                        matrix[team1] = team1Init;
+                        sortable.push(matrix[team1]);
+                    }
+                    if (!matrix[team2]) {
+                        var team2Init = initializeTeam(team2);
+                        matrix[team2] = team2Init;
+                        sortable.push(matrix[team2]);
+                    }
+
+                    if (team1Goals > team2Goals) {
+                        matrix[team1].regularSeason.win += 1;
+                        matrix[team1].regularSeason.points += 2;
+                        matrix[team2].regularSeason.loss += 1;
+
+                    } else if (team2Goals > team1Goals) {
+                        matrix[team2].regularSeason.win += 1;
+                        matrix[team2].regularSeason.points += 2;
+                        matrix[team1].regularSeason.loss += 1;
+
+                    } else {
+
+                        matrix[team1].regularSeason.tie += 1;
+                        matrix[team1].regularSeason.points += 1;
+                        matrix[team2].regularSeason.tie += 1;
+                        matrix[team2].regularSeason.points += 1;
+
+                    }
+
+                    matrix[team1].regularSeason.for += team1Goals;
+                    matrix[team2].regularSeason.for += team2Goals;
+
+                    matrix[team1].regularSeason.against += team2Goals;
+                    matrix[team2].regularSeason.against += team1Goals;
+                    matrix[team1].regularSeason.games += 1;
+                    matrix[team2].regularSeason.games += 1;
+                    matrix[team1].regularSeason.diff += (team1Goals - team2Goals);
+                    matrix[team2].regularSeason.diff += (team2Goals - team1Goals);
+
+                    matrix[team1].regularSeason.winPct = Number(matrix[team1].win / (matrix[team1].win + matrix[team1].loss)).toFixed(3);
+                    matrix[team2].regularSeason.winPct = Number(matrix[team2].win / (matrix[team2].win + matrix[team2].loss)).toFixed(3);
+
+
+                });
+
+
+                playoff.forEach(function(result) {
+
                     var team1 = result.home;
                     var team1Goals = Number(result.homeScore);
                     var team2 = result.visitor;
                     var team2Goals = Number(result.visitorScore);
 
-
-
                     if (!matrix[team1]) {
-                        matrix[team1] = {
-                            team: team1,
-                            games: 0,
-                            win: 0,
-                            loss: 0,
-                            tie: 0,
-                            points: 0,
-                            for: 0,
-                            against: 0,
-                            diff: 0,
-                            winPct: 0,
-                            oppWinPct: 0
-                        };
-
+                        var team1Init = initializeTeam(team1);
+                        matrix[team1] = team1Init;
                         sortable.push(matrix[team1]);
-
-
                     }
-
                     if (!matrix[team2]) {
-
-                        matrix[team2] = {
-                            team: team2,
-                            games: 0,
-                            win: 0,
-                            loss: 0,
-                            tie: 0,
-                            points: 0,
-                            for: 0,
-                            against: 0,
-                            diff: 0,
-                            winPct: 0,
-                            oppWinPct: 0
-                        };
+                        var team2Init = initializeTeam(team2);
+                        matrix[team2] = team2Init;
                         sortable.push(matrix[team2]);
-
                     }
+
+
 
                     if (team1Goals > team2Goals) {
                         matrix[team1].win += 1;
@@ -104,7 +173,8 @@ module.exports = function(app) {
                 resolve({
                     matrix: matrix,
                     sortable: sortable,
-                    allGames: allGames
+                    allGames: allGames,
+                    regularSeasonGames: regularSeasonGames
                 });
 
             });
@@ -125,31 +195,48 @@ module.exports = function(app) {
             var matrix = result.matrix;
             var id = req.params.id;
             Game.find({
+
                     $or: [{
                         'home': id
                     }, {
                         'visitor': id
                     }]
+
                 },
                 function(err, docs) {
                     if (!err) {
                         var result = {};
-                        result.games = docs;
+                        var playoff = docs.filter(function(game) {
+                            return game.type !== 'RS';
+                        });
+                        var regular = docs.filter(function(game) {
+                            return game.type === 'RS';
+                        });
+                        result.games = playoff;
+                        result.regularSeason = regular;
                         var myteam = matrix[id];
                         result.record = {
-                            win: myteam.win,
-                            loss: myteam.loss,
-                            tie: myteam.tie,
-                            pct: Number(myteam.win / (myteam.win + myteam.loss)).toFixed(3),
-                            for: myteam.for,
-                            against: myteam.against
+                            win: myteam ? myteam.win : 0,
+                            loss: myteam ? myteam.loss : 0,
+                            tie: myteam ? myteam.tie : 0,
+                            pct: myteam ? Number(myteam.win / (myteam.win + myteam.loss)).toFixed(3) : 0,
+                            for: myteam ? myteam.for : 0,
+                            against: myteam ? myteam.against : 0
                         }
                         result.opponentRecord = {
                             win: 0,
                             loss: 0,
                             tie: 0
                         }
-                        docs.forEach(function(game) {
+                        result.regularSeasonRecord = {
+                            win: myteam ? myteam.regularSeason.win : 0,
+                            loss: myteam ? myteam.regularSeason.loss : 0,
+                            tie: myteam ? myteam.regularSeason.tie : 0,
+                            pct: myteam ? Number(myteam.regularSeason.winPct).toFixed(3) : 0,
+                            for: myteam ? myteam.regularSeason.for : 0,
+                            against: myteam ? myteam.regularSeason.against : 0
+                        }
+                        playoff.forEach(function(game) {
                             var home = game.home;
                             var visitor = game.visitor;
                             var team = home === id ? visitor : home;
@@ -211,6 +298,7 @@ module.exports = function(app) {
             res.json(games); // return all games in JSON format
         });
     });
+
 
     app.post('/api/games', function(req, res) {
         var games = req.body;
