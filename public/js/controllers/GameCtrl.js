@@ -9,6 +9,7 @@ angular.module('GameCtrl', []).controller('GameController', function($scope, Gam
         Game.get().success(function(data) {
             console.log('got it');
             $scope.games = data;
+
         });
     }
 

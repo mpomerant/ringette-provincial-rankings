@@ -26,6 +26,14 @@ module.exports = mongoose.model('Game', {
     type: {
         type: String,
         default: ''
+    },
+    association: {
+        type: String,
+        default: ''
+    },
+    division: {
+        type: String,
+        default: ''
     }
 
 });

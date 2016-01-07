@@ -6,8 +6,13 @@ angular.module('GameService', []).factory('Game', ['$http', function($http) {
             return $http.get('/api/team/' + id);
         },
 
-        standings: function() {
-            return $http.get('/api/standings');
+        standings: function(regularSeason) {
+            if (!regularSeason) {
+                return $http.get('/api/standings');
+            } else {
+                return $http.get('/api/standings?regularSeason=true');
+            }
+
         },
         // call to get all nerds
         get: function() {

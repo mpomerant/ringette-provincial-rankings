@@ -8,7 +8,7 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
 
     var getStandings = function() {
 
-        Game.standings(true).success(function(data) {
+        Game.standings().success(function(data) {
             var standings = data.filter(function(game) {
                 return game.games > 0;
             })
@@ -18,7 +18,7 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
                 Game.team(teamId).success(function(data) {
                     //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
                     team.oppWinPct =
-                        Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
+                        Number(data.opponentRecord.win / (data.opponentRecord.win + data.opponentRecord.loss)).toFixed(3);
                 });
 
             });

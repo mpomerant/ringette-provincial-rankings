@@ -1,0 +1,29 @@
+<h2>Standings</h2>
+<table class="table standingstable">
+    <tr>
+        <th class="centerText">
+            <span style='font-size: 1.25em'>Team</span>
+            <span class="sortorder" ng-click="order('team')" ng-class="{reverse:reverse}"></span></th>
+        <th class="centerText">
+            <span style='font-size: 1.25em'>Games</span>
+            <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
+        <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
+        <th class="centerText">
+            <span style='font-size: 1.25em'>Points</span>
+            <span class="sortorder" ng-click="order('points')" ng-class="{reverse:reverse}"></span></th>
+        <th class="centerText visible-lg">
+            <span style='font-size: 1.25em'>Win %</span>
+            <span class="sortorder" ng-click="order('winPct')" ng-class="{reverse:reverse}"></span></th>
+        <th class="centerText visible-lg">
+            <span style='font-size: 1.25em'>+/-</span>
+            <span class="sortorder" ng-click="order('diff')" ng-class="{reverse:reverse}"></span></th>
+    </tr>
+    <tr ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 13 && predicate === 'points' && reverse === true}">
+        <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
+        <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
+        <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
+        <td style='font-size: 1.25em' class="centerText visible-lg">{{team.winPct}}</td>
+        <td style='font-size: 1.25em' class="centerText visible-lg">{{team.diff}}</td>
+    </tr>
+</table>

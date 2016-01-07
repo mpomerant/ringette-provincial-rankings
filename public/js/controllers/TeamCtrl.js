@@ -12,12 +12,13 @@ angular.module('TeamCtrl', []).controller('TeamController', function($scope, $ro
 
         Game.team($scope.teamId).success(function(data) {
             $scope.games = data;
-            $scope.winPct = Number(data.record.win / (data.record.win + data.record.loss)).toFixed(3);
-            $scope.oppWinPct = Number(data.opponentRecord.win / (data.opponentRecord.win + data.opponentRecord.loss)).toFixed(3);
+            $scope.winPct = Number(data.record.pct).toFixed(3);
+            $scope.oppWinPct = Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
         });
     }
 
     getGames();
+
 
 
 
