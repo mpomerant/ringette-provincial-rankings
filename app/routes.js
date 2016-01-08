@@ -266,6 +266,7 @@ module.exports = function(app) {
 
     app.get('/api/standings/:association', function(req, res) {
         var association = req.params.association;
+        console.log('getting ' + association + ' standings');
         Game.find({
 
             $and: [{
@@ -296,37 +297,37 @@ module.exports = function(app) {
                     }
 
                     if (team1Goals > team2Goals) {
-                        matrix[team1].regularSeason.win += 1;
-                        matrix[team1].regularSeason.points += 2;
-                        matrix[team2].regularSeason.loss += 1;
+                        matrix[team1].win += 1;
+                        matrix[team1].points += 2;
+                        matrix[team2].loss += 1;
 
                     } else if (team2Goals > team1Goals) {
-                        matrix[team2].regularSeason.win += 1;
-                        matrix[team2].regularSeason.points += 2;
-                        matrix[team1].regularSeason.loss += 1;
+                        matrix[team2].win += 1;
+                        matrix[team2].points += 2;
+                        matrix[team1].loss += 1;
 
                     } else {
 
-                        matrix[team1].regularSeason.tie += 1;
-                        matrix[team1].regularSeason.points += 1;
-                        matrix[team2].regularSeason.tie += 1;
-                        matrix[team2].regularSeason.points += 1;
+                        matrix[team1].tie += 1;
+                        matrix[team1].points += 1;
+                        matrix[team2].tie += 1;
+                        matrix[team2].points += 1;
 
                     }
 
-                    matrix[team1].regularSeason.for += team1Goals;
-                    matrix[team2].regularSeason.for += team2Goals;
+                    matrix[team1].for += team1Goals;
+                    matrix[team2].for += team2Goals;
 
-                    matrix[team1].regularSeason.against += team2Goals;
-                    matrix[team2].regularSeason.against += team1Goals;
-                    matrix[team1].regularSeason.games += 1;
-                    matrix[team2].regularSeason.games += 1;
-                    matrix[team1].regularSeason.diff += (team1Goals - team2Goals);
-                    matrix[team2].regularSeason.diff += (team2Goals - team1Goals);
+                    matrix[team1].against += team2Goals;
+                    matrix[team2].against += team1Goals;
+                    matrix[team1].games += 1;
+                    matrix[team2].games += 1;
+                    matrix[team1].diff += (team1Goals - team2Goals);
+                    matrix[team2].diff += (team2Goals - team1Goals);
 
 
-                    matrix[team1].regularSeason.winPct = Number(matrix[team1].regularSeason.points / (matrix[team1].regularSeason.games * 2)).toFixed(3);
-                    matrix[team2].regularSeason.winPct = Number(matrix[team2].regularSeason.points / (matrix[team2].regularSeason.games * 2)).toFixed(3);
+                    matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
+                    matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
 
 
                 });

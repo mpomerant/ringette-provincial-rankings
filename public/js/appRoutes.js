@@ -19,11 +19,19 @@
          controller: 'GameController'
      })
 
+      // standings page that will use the StandingsController
+     .when('/standings/:association', {
+         templateUrl: 'views/standings-rs.html',
+         controller: 'StandingsRsController'
+     })
+
      // standings page that will use the StandingsController
      .when('/standings', {
          templateUrl: 'views/standings.html',
          controller: 'StandingsController'
      });
+
+    
 
      $locationProvider.html5Mode(true);
 

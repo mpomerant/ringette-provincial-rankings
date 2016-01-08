@@ -1,27 +1,18 @@
-angular.module('StandingsCtrl', []).controller('StandingsController', function($scope, Game) {
+angular.module('StandingsRsCtrl', []).controller('StandingsRsController', function($scope, $routeParams, Game) {
 
-    $scope.standings;
-    $scope.predicate = 'points';
+    $scope.association = $routeParams.association;
+    $scope.predicate = 'winPct';
     $scope.reverse = true;
-
 
 
     var getStandings = function() {
 
-        Game.standings().success(function(data) {
+        Game.regularSeasonStandings($scope.association).success(function(data) {
             var standings = data.filter(function(game) {
                 return game.games > 0;
             })
             $scope.standings = standings;
-            $scope.standings.forEach(function(team) {
-                var teamId = team.team;
-                Game.team(teamId).success(function(data) {
-                    //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
-                    team.oppWinPct =
-                        Number(data.opponentRecord.win / (data.opponentRecord.win + data.opponentRecord.loss)).toFixed(3);
-                });
-
-            });
+            
         });
     }
 
