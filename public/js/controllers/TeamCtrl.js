@@ -1,4 +1,4 @@
-angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($scope, $routeParams, Game) {
+var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($scope, $routeParams, Game) {
 
 
     $scope.games;
@@ -90,7 +90,9 @@ angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($
 
 
 
-}).directive("gameContainer", function() {
+});
+
+m.directive("gameContainer", function() {
     return {
 
         template: "<div style='background-color: blue'><h4 style='color: white'>{{title}}</h4></div><div><h3>{{content}}</h3></div>",

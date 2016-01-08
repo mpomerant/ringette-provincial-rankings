@@ -34,6 +34,10 @@ module.exports = mongoose.model('Game', {
     division: {
         type: String,
         default: ''
+    },
+    gameId: {
+        type: String,
+        default: ''
     }
 
 });

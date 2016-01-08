@@ -427,7 +427,8 @@ module.exports = function(app) {
                 type: game.type,
                 tournament: game.tournament,
                 association: game.association,
-                division: game.division
+                division: game.division,
+                gameId: game.gameId
             });
             gameModel.save(function(err) {
                 if (!err) {
