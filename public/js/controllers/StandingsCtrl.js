@@ -1,7 +1,7 @@
 angular.module('StandingsCtrl', []).controller('StandingsController', function($scope, Game) {
 
     $scope.standings;
-    $scope.predicate = 'points';
+    $scope.predicate = 'winPct';
     $scope.reverse = true;
 
 
