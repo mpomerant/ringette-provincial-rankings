@@ -1,5 +1,6 @@
 var Game = require('./models/gameResult');
 var path = require('path');
+var async = require('async');
 module.exports = function(app) {
     'use strict';
 
@@ -75,6 +76,7 @@ module.exports = function(app) {
                     var team2Goals = Number(regularGame.visitorScore);
                     regularGoals += team1Goals;
                     regularGoals += team2Goals;
+
                     if (!matrix[team1]) {
                         var team1Init = initializeTeam(team1);
                         matrix[team1] = team1Init;
@@ -117,7 +119,8 @@ module.exports = function(app) {
 
                     matrix[team1].regularSeason.winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
                     matrix[team2].regularSeason.winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
-
+                    matrix[team1].association = regularGame.association;
+                    matrix[team2].association = regularGame.association;
 
                 });
 
@@ -203,6 +206,23 @@ module.exports = function(app) {
     }
 
 
+    app.get('/api/team', function(req, res){
+        getTeamMatrix().then(function(result) {
+            console.log(result.matrix);
+            var output = [];
+            Object.getOwnPropertyNames(result.matrix).forEach(function(teamName){
+                console.log(teamName);
+                var team = result.matrix[teamName]; 
+                var obj = {
+                    team: team.team,
+                    association: team.association
+                }
+                output.push(obj);
+            })
+ 
+            res.json(output);
+        });
+    });
 
     app.get('/api/team/:id', function(req, res) {
 
@@ -417,30 +437,58 @@ module.exports = function(app) {
         var games = req.body;
         var gameModels = [];
 
+        var toSave = [];
 
-        games.forEach(function(game) {
-            var gameModel = new Game({
-                home: game.home,
-                visitor: game.visitor,
-                homeScore: game.homeScore,
-                visitorScore: game.visitorScore,
-                type: game.type,
-                tournament: game.tournament,
-                association: game.association,
-                division: game.division,
-                gameId: game.gameId
-            });
-            gameModel.save(function(err) {
+        async.eachSeries(games, function(game, callback) {
+            Game.find({
+
+
+                'gameId': game.gameId
+
+
+            }, function(err, existingGames) {
                 if (!err) {
-                    return console.log("created");
-                } else {
-                    return console.log(err);
-                }
-            });
-            gameModels.push(gameModel);
-        })
+                    if (existingGames.length === 0) {
+                        var gameModel = new Game({
+                            home: game.home,
+                            visitor: game.visitor,
+                            homeScore: game.homeScore,
+                            visitorScore: game.visitorScore,
+                            type: game.type,
+                            tournament: game.tournament,
+                            association: game.association,
+                            division: game.division,
+                            gameId: game.gameId
+                        });
+                        gameModel.save(function(doc) {
+                            console.log('created: ' + gameModel.gameId);
+                            gameModels.push(gameModel);
+                            callback();
+                        }, function(err) {
+                            console.log(err);
+                            callback()
+                        });
 
-        return res.send(gameModels);
+
+
+                    } else {
+                        console.log(game.gameId + ' already exists');
+                        callback();
+                    }
+                }
+
+            });
+
+        }, function(err) {
+            if (!err) {
+                res.json(gameModels);
+            }
+        });
+
+
+
+
+
     });
 
 

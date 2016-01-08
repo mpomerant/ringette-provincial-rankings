@@ -1,6 +1,11 @@
 angular.module('StandingsRsCtrl', []).controller('StandingsRsController', function($scope, $routeParams, Game) {
-
+    var assocMap = {
+        'ncrll' : 'Eastern',
+        'wora': 'Western',
+        'ocrrl': 'Central'
+    }
     $scope.association = $routeParams.association;
+    $scope.associationName = assocMap[$scope.association]
     $scope.predicate = 'winPct';
     $scope.reverse = true;
 
