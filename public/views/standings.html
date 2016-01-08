@@ -11,7 +11,7 @@
         <th class="centerText">
             <span style='font-size: 1.25em'>Points</span>
             <span class="sortorder" ng-click="order('points')" ng-class="{reverse:reverse}"></span></th>
-        <th class="centerText visible-lg">
+        <th class="centerText">
             <span style='font-size: 1.25em'>Win %</span>
             <span class="sortorder" ng-click="order('winPct')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText visible-lg">
@@ -26,7 +26,7 @@
         <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
         <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
-        <td style='font-size: 1.25em' class="centerText visible-lg">{{team.winPct}}</td>
+        <td style='font-size: 1.25em' class="centerText">{{team.winPct}}</td>
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.oppWinPct}}</td>
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.diff}}</td>
     </tr>

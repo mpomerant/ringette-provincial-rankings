@@ -49,7 +49,14 @@ module.exports = function(app) {
             var sortable = [];
             var allGames = [];
             var regularSeasonGames = [];
+            var regularGoals = 0;
+            var tournamentGoals = 0;
+            var regularGamesCount = 0;
+            var tournamentGamesCount = 0;
             Game.find().exec().then(function(games) {
+
+
+
                 var playoff = games.filter(function(game) {
                     return game.type !== 'RS';
                 });
@@ -58,13 +65,16 @@ module.exports = function(app) {
                 });
                 allGames = playoff;
                 regularSeasonGames = regular;
-
+                regularGamesCount = regular.length;
+                tournamentGamesCount = playoff.length;
                 regular.forEach(function(regularGame) {
 
                     var team1 = regularGame.home;
                     var team1Goals = Number(regularGame.homeScore);
                     var team2 = regularGame.visitor;
                     var team2Goals = Number(regularGame.visitorScore);
+                    regularGoals += team1Goals;
+                    regularGoals += team2Goals;
                     if (!matrix[team1]) {
                         var team1Init = initializeTeam(team1);
                         matrix[team1] = team1Init;
@@ -118,6 +128,8 @@ module.exports = function(app) {
                     var team1Goals = Number(result.homeScore);
                     var team2 = result.visitor;
                     var team2Goals = Number(result.visitorScore);
+                    tournamentGoals += team1Goals;
+                    tournamentGoals += team2Goals;
 
                     if (!matrix[team1]) {
                         var team1Init = initializeTeam(team1);
@@ -174,7 +186,12 @@ module.exports = function(app) {
                     matrix: matrix,
                     sortable: sortable,
                     allGames: allGames,
-                    regularSeasonGames: regularSeasonGames
+                    regularSeasonGames: regularSeasonGames,
+                    regularGoals: regularGoals,
+                    tournamentGoals: tournamentGoals,
+                    regularGamesCount: regularGamesCount,
+                    tournamentGamesCount: tournamentGamesCount
+
                 });
 
             });
@@ -189,11 +206,13 @@ module.exports = function(app) {
 
     app.get('/api/team/:id', function(req, res) {
 
-
-
         getTeamMatrix().then(function(result) {
             var matrix = result.matrix;
             var id = req.params.id;
+            var regularGoals = result.regularGoals;
+            var tournamentGoals = result.tournamentGoals;
+            var regularGamesCount = result.regularGamesCount;
+            var tournamentGamesCount = result.tournamentGamesCount;
             Game.find({
 
                     $or: [{
@@ -255,6 +274,16 @@ module.exports = function(app) {
 
 
                         });
+
+
+                        result.stats = {};
+                        result.stats.regularGoals = regularGoals;
+                        result.stats.tournamentGoals = tournamentGoals;
+                        result.stats.regularGamesCount = regularGamesCount;
+                        result.stats.tournamentGamesCount = tournamentGamesCount;
+                        result.stats.regularAverageGoals = regularGoals / regularGamesCount / 2;
+                        result.stats.tournamentAverageGoals = tournamentGoals / tournamentGamesCount / 2;
+                        result.stats.totalAverageGoals = ((regularGoals + tournamentGoals) / (tournamentGamesCount + regularGamesCount)) / 2;
                         res.json(result);
                     }
 

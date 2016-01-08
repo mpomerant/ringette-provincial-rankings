@@ -31,15 +31,11 @@
     </div>
 </div>
 <div class="row">
-    <h2>Tournament Games Played</h2>
-    <table class="table gametable">
-        <tr ng-repeat="game in games.games">
-            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
-            <td style="width: 10%" style='font-size: 1.25em'>{{game.homeScore}}</td>
-            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
-            <td style="width: 10%" style='font-size: 1.25em'>{{game.visitorScore}}</td>
-        </tr>
-    </table>
+	<h2>Regular Season Winning Percentage by Game</h2>
+    <div class="col-md-8 col-md-offset-2 col-xs-12">
+        <canvas id="line" class="chart chart-line" chart-options="options" chart-data="data" chart-labels="labels" chart-legend="true" chart-series="series" chart-click="onClick">
+        </canvas>
+    </div>
 </div>
 <br/>
 <div class="row">
@@ -53,3 +49,17 @@
         </tr>
     </table>
 </div>
+
+<br/>
+<div class="row">
+    <h2>Tournament Games Played</h2>
+    <table class="table gametable">
+        <tr ng-repeat="game in games.games">
+            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
+            <td style="width: 10%" style='font-size: 1.25em'>{{game.homeScore}}</td>
+            <td style="width: 40%"><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>
+            <td style="width: 10%" style='font-size: 1.25em'>{{game.visitorScore}}</td>
+        </tr>
+    </table>
+</div>
+<br/>
