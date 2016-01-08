@@ -4,25 +4,25 @@
 <div class="row">
     <div class="col col-xs-12 col-sm-6 col-md-3">
         <div class="list-group">
-            <a href="#" class="list-group-item active">Western</a>
+            <a href="/standings/wora" class="list-group-item active">Western</a>
             <a data-ng-repeat="team in westTeams | orderBy:'team'" href="/team/{{team.team}}" class="list-group-item">{{team.team}}</a>
         </div>
     </div>
     <div class="col col-xs-12 col-sm-6 col-md-3">
         <div class="list-group">
-            <a href="#" class="list-group-item active">Central</a>
+            <a href="/standings/ocrrl" class="list-group-item active">Central</a>
             <a data-ng-repeat="team in centralTeams | orderBy:'team'" href="/team/{{team.team}}" class="list-group-item">{{team.team}}</a>
         </div>
     </div>
     <div class="col col-xs-12 col-sm-6 col-md-3">
         <div class="list-group">
-            <a href="#" class="list-group-item active">Eastern</a>
+            <a href="/standings/ncrll" class="list-group-item active">Eastern</a>
             <a data-ng-repeat="team in eastTeams | orderBy:'team'" href="/team/{{team.team}}" class="list-group-item">{{team.team}}</a>
         </div>
     </div>
     <div class="col col-xs-12 col-sm-6 col-md-3">
         <div class="list-group">
-            <a href="#" class="list-group-item active">Other</a>
+            <a class="list-group-item active">Other</a>
             <a data-ng-repeat="team in otherTeams | orderBy:'team'" href="/team/{{team.team}}" class="list-group-item">{{team.team}}</a>
         </div>
     </div>
