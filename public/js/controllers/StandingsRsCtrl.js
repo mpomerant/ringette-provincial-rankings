@@ -6,7 +6,7 @@ angular.module('StandingsRsCtrl', []).controller('StandingsRsController', functi
     }
     $scope.association = $routeParams.association;
     $scope.associationName = assocMap[$scope.association]
-    $scope.predicate = 'winPct';
+    $scope.predicate = 'points';
     $scope.reverse = true;
 
 
