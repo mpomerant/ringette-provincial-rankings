@@ -128,7 +128,7 @@ module.exports = function(app) {
                                 });
 
                                 if (homeTeam.length > 0){
-                                    console.log('hello: ' + homeTeam[0].provincial);
+                                    
                                     matrix[team1].provincial = homeTeam[0].provincial;
                                 }
                                 var visitorTeam = teams.filter(function(team){
@@ -137,7 +137,7 @@ module.exports = function(app) {
                                 });
 
                                 if (visitorTeam.length > 0){
-                                    console.log('hello1: ' + visitorTeam[0].provincial);
+                                   
                                     matrix[team2].provincial = visitorTeam[0].provincial;
                                 }
 
@@ -154,17 +154,24 @@ module.exports = function(app) {
 
                             }, function(err, existing) {
                                 if (!err) {
-                                    console.log(JSON.stringify(existing, null, 4));
-                                    var standings = new models.Standings({
+                                    if (!existing){
+                                        var standings = new models.Standings({
                                         association: association,
                                         division: 'U14A',
                                         teams: sortable
                                     });
-                                    var id = existing && existing.length > 0 ? existing[0]._id : 'dummy';
-                                    console.log('looking for: ' + association);
-                                    models.Standings.update({
+                                        standings.save(function(doc){
+                                            console.log('saved');
+                                            callback();
+                                        })
+
+                                    } else {
+                                        var oldStandings = existing[0];
+                                        oldStandings.teams = sortable;
+
+                                        models.Standings.update({
                                         'association': association
-                                    }, standings, {
+                                    }, oldStandings, {
                                         upsert: true
                                     }, function(err, doc) {
                                         if (!err) {
@@ -175,6 +182,15 @@ module.exports = function(app) {
                                             callback();
                                         }
                                     });
+
+                                    }
+                                    
+                                    
+
+
+                                   
+                            
+                                    
                                 }
 
                             });
