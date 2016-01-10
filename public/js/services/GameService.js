@@ -6,9 +6,10 @@ angular.module('GameService', []).factory('Game', ['$http', function($http) {
             return $http.get('/api/team/' + id);
         },
         teams: function() {
-            return $http.get('/api/team/');
+            return $http.get('/api/team/?detail=true');
         },
 
+       
         standings: function() {
             
                 return $http.get('/api/standings');

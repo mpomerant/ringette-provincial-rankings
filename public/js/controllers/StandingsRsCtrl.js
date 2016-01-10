@@ -1,11 +1,7 @@
 angular.module('StandingsRsCtrl', []).controller('StandingsRsController', function($scope, $routeParams, Game) {
-    var assocMap = {
-        'ncrll' : 'Eastern',
-        'wora': 'Western',
-        'ocrrl': 'Central'
-    }
+    
     $scope.association = $routeParams.association;
-    $scope.associationName = assocMap[$scope.association]
+    
     $scope.predicate = 'points';
     $scope.reverse = true;
 
@@ -13,7 +9,7 @@ angular.module('StandingsRsCtrl', []).controller('StandingsRsController', functi
     var getStandings = function() {
 
         Game.regularSeasonStandings($scope.association).success(function(data) {
-            var standings = data.filter(function(game) {
+            var standings = data.teams.filter(function(game) {
                 return game.games > 0;
             })
             $scope.standings = standings;

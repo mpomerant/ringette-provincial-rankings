@@ -1,0 +1,45 @@
+<h2>Add Team</h2>
+<form>
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input required ng-trim="true" ng-model="team.name" type="text" class="form-control" id="name">
+    </div>
+    <div class="form-group">
+        <label for="association">Association:</label>
+        <select class="form-control" name="associationSelect" id="association" ng-model="team.association">
+            <option value="Eastern">Eastern</option>
+            <option value="Western">Western</option>
+            <option value="Central">Central</option>
+            <option value="North East">North East</option>
+            <option value="Southern">Southern</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="division">Division:</label>
+        <select class="form-control" name="divisionSelect" id="division" ng-model="team.division">
+            <option value="U14A">U14A</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="provincial">Provincial:</label>
+        <input   ng-model="team.provincial" type="checkbox" class="form-control" id="provincial">
+    </div>
+    <button type="button" class="btn btn-default" ng-click="submit()">Create/Update</button>
+    <button type="button" class="btn btn-default" ng-click="delete()">Delete</button>
+</form>
+<h2>Teams</h2>
+<table class="table">
+    <tr>
+        <th class="centerText">
+            <span style='font-size: 1.25em'>Team</span></th>
+        <th class="centerText">
+            <span style='font-size: 1.25em'>Association</span></th>
+        <th class="centerText">
+            <span style='font-size: 1.25em'>Division</span></th>
+    </tr>
+    <tr ng-class="team.provincial ? 'provincial' : ''" ng-repeat="team in teams | orderBy:'name'" ng-click="setSelected(team)">
+        <td style='font-size: 1.25em'><a ng-href="/team/{{team.name}}">{{team.name}}</a></td>
+        <td style='font-size: 1.25em'>{{team.association}}</td>
+        <td style='font-size: 1.25em'>{{team.division}}</td>
+    </tr>
+</table>

@@ -31,6 +31,14 @@ module.exports = mongoose.model('Game', {
         type: String,
         default: ''
     },
+    homeAssociation: {
+        type: String,
+        default: ''
+    },
+    visitorAssociation: {
+        type: String,
+        default: ''
+    },
     division: {
         type: String,
         default: ''

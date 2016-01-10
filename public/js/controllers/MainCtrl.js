@@ -1,27 +1,31 @@
-angular.module('MainCtrl', []).controller('MainController', function($scope, Game) {
+angular.module('MainCtrl', []).controller('MainController', function($scope, Team) {
 
  	$scope.westTeams;
  	$scope.centralTeams;
  	$scope.eastTeams;
- 	$scope.otherTeams;
+ 	$scope.southTeams;
+ 	$scope.northEastTeams;
     
 
 
     var getTeams = function() {
 
-        Game.teams().success(function(data) {
+        Team.get().success(function(data) {
              $scope.westTeams = data.filter(function(team) {
-                return team.association === 'wora';
+                return team.association === 'Western';
             });
              $scope.eastTeams = data.filter(function(team) {
-                return team.association === 'ncrll';
+                return team.association === 'Eastern';
             });
 
              $scope.centralTeams = data.filter(function(team) {
-                return team.association === 'ocrrl';
+                return team.association === 'Central';
             });
-             $scope.otherTeams = data.filter(function(team) {
-                return !team.association;
+             $scope.southTeams = data.filter(function(team) {
+                return team.association === 'Southern';
+            });
+             $scope.northEastTeams = data.filter(function(team) {
+                return team.association === 'North East';
             });
   
         });

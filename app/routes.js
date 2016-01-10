@@ -1,4 +1,6 @@
 var Game = require('./models/gameResult');
+var Team = require('./models/team');
+var models = require('./models/standings')();
 var path = require('path');
 var async = require('async');
 module.exports = function(app) {
@@ -44,6 +46,163 @@ module.exports = function(app) {
 
 
     }
+
+
+
+    var calculateStandings = function() {
+        return new Promise(function(resolve, reject) {
+
+            var allTeams = Team.find().exec().then(function(teams) {
+
+                var associations = ['Eastern', 'Western', 'Central', 'Southern', 'North East'];
+                async.eachSeries(associations, function(association, callback) {
+
+                    console.log('getting ' + association + ' standings');
+                    Game.find({
+
+                        $and: [{
+                            'association': association
+                        }, {
+                            'type': 'RS'
+                        }]
+
+                    }, function(err, regular) {
+                        if (!err) {
+                            console.log('after find Games');
+                            var matrix = {};
+
+                            var sortable = [];
+                            regular.forEach(function(regularGame) {
+
+                                var team1 = regularGame.home;
+                                var team1Goals = Number(regularGame.homeScore);
+                                var team2 = regularGame.visitor;
+                                var team2Goals = Number(regularGame.visitorScore);
+                                if (!matrix[team1]) {
+                                    var team1Init = initializeTeam(team1);
+                                    matrix[team1] = team1Init;
+                                    sortable.push(matrix[team1]);
+                                }
+                                if (!matrix[team2]) {
+                                    var team2Init = initializeTeam(team2);
+                                    matrix[team2] = team2Init;
+                                    sortable.push(matrix[team2]);
+                                }
+
+                                if (team1Goals > team2Goals) {
+                                    matrix[team1].win += 1;
+                                    matrix[team1].points += 2;
+                                    matrix[team2].loss += 1;
+
+                                } else if (team2Goals > team1Goals) {
+                                    matrix[team2].win += 1;
+                                    matrix[team2].points += 2;
+                                    matrix[team1].loss += 1;
+
+                                } else {
+
+                                    matrix[team1].tie += 1;
+                                    matrix[team1].points += 1;
+                                    matrix[team2].tie += 1;
+                                    matrix[team2].points += 1;
+
+                                }
+
+                                matrix[team1].for += team1Goals;
+                                matrix[team2].for += team2Goals;
+
+                                matrix[team1].against += team2Goals;
+                                matrix[team2].against += team1Goals;
+                                matrix[team1].games += 1;
+                                matrix[team2].games += 1;
+                                matrix[team1].diff += (team1Goals - team2Goals);
+                                matrix[team2].diff += (team2Goals - team1Goals);
+
+
+                                matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
+                                matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
+
+                                var homeTeam = teams.filter(function(team){
+                                    
+                                    return team.name === team1;
+                                });
+
+                                if (homeTeam.length > 0){
+                                    console.log('hello: ' + homeTeam[0].provincial);
+                                    matrix[team1].provincial = homeTeam[0].provincial;
+                                }
+                                var visitorTeam = teams.filter(function(team){
+                                    
+                                    return team.name === team2;
+                                });
+
+                                if (visitorTeam.length > 0){
+                                    console.log('hello1: ' + visitorTeam[0].provincial);
+                                    matrix[team2].provincial = visitorTeam[0].provincial;
+                                }
+
+
+                            });
+
+
+
+                            models.Standings.find({
+
+
+                                'association': association
+
+
+                            }, function(err, existing) {
+                                if (!err) {
+                                    console.log(JSON.stringify(existing, null, 4));
+                                    var standings = new models.Standings({
+                                        association: association,
+                                        division: 'U14A',
+                                        teams: sortable
+                                    });
+                                    var id = existing && existing.length > 0 ? existing[0]._id : 'dummy';
+                                    console.log('looking for: ' + association);
+                                    models.Standings.update({
+                                        'association': association
+                                    }, standings, {
+                                        upsert: true
+                                    }, function(err, doc) {
+                                        if (!err) {
+                                            console.log('updated ' + association);
+                                            callback();
+                                        } else {
+                                            console.log('error: ' + err);
+                                            callback();
+                                        }
+                                    });
+                                }
+
+                            });
+
+
+
+                            //res.json(sortable);
+                        }
+
+                    });
+
+
+                }, function(err) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve('done');
+                    }
+
+                });
+            });
+
+        });
+
+
+    }
+
+
     var getTeamMatrix = function() {
         return new Promise(function(resolve, reject) {
             var matrix = {};
@@ -205,23 +364,109 @@ module.exports = function(app) {
 
     }
 
+    app.put('/api/team/:id', function(req, res) {
+        var team = req.body;
+        var id = req.params.id;
 
-    app.get('/api/team', function(req, res){
-        getTeamMatrix().then(function(result) {
-            console.log(result.matrix);
-            var output = [];
-            Object.getOwnPropertyNames(result.matrix).forEach(function(teamName){
-                console.log(teamName);
-                var team = result.matrix[teamName]; 
-                var obj = {
-                    team: team.team,
-                    association: team.association
+    });
+
+    app.post('/api/team', function(req, res) {
+        var teams = req.body;
+        console.log('teams: ' + teams);
+        var teamModels = [];
+        async.eachSeries(teams, function(team, callback) {
+            Team.find({
+
+
+                '_id': team._id
+
+
+            }, function(err, existingTeams) {
+                if (!err) {
+                    console.log(JSON.stringify(existingTeams, null, 4));
+                    if (existingTeams.length === 0) {
+                        var teamModel = new Team({
+                            name: team.name,
+                            association: team.association,
+                            division: team.division,
+                            provincial: team.provincial
+                        });
+                        teamModel.save(function(doc) {
+                            console.log('created: ' + teamModel.name);
+                            teamModels.push(teamModel);
+                            callback();
+                        }, function(err) {
+                            console.log(err);
+                            callback()
+                        });
+
+
+
+                    } else {
+                        console.log(team.name + ' already exists...updating');
+                        Team.update({
+                            '_id': existingTeams[0]._id
+                        }, team, {
+                            upsert: true
+                        }, callback);
+
+                    }
                 }
-                output.push(obj);
-            })
- 
-            res.json(output);
+
+            });
+
+        }, function(err) {
+            if (!err) {
+                res.json(teamModels);
+            }
         });
+
+    });
+
+    app.delete('/api/team/:id', function(req, res) {
+
+        var id = req.params.id;
+        console.log('removing: ' + id);
+        var query = Team.remove({
+            _id: id
+        });
+        query.exec().then(function() {
+            res.json({
+                id: id
+            });
+        });
+
+    });
+
+    app.get('/api/team', function(req, res) {
+        var isDetail = req.query.detail;
+
+        if (isDetail) {
+            getTeamMatrix().then(function(result) {
+                console.log(result.matrix);
+                var output = [];
+                Object.getOwnPropertyNames(result.matrix).forEach(function(teamName) {
+                    console.log(teamName);
+                    var team = result.matrix[teamName];
+                    var obj = {
+                        team: team.team,
+                        association: team.association
+                    }
+                    output.push(obj);
+                })
+
+                res.json(output);
+            });
+
+        } else {
+            // get all the users
+            Team.find({}, function(err, teams) {
+                if (err) throw err;
+
+                res.json(teams);
+            });
+        }
+
     });
 
     app.get('/api/team/:id', function(req, res) {
@@ -316,76 +561,16 @@ module.exports = function(app) {
     app.get('/api/standings/:association', function(req, res) {
         var association = req.params.association;
         console.log('getting ' + association + ' standings');
-        Game.find({
-
-            $and: [{
-                'association': association
-            }, {
-                'type': 'RS'
-            }]
-
-        }, function(err, regular) {
+        models.Standings.find({
+            association: association
+        }, function(err, standings) {
             if (!err) {
-                var matrix = {};
-                var sortable = [];
-                regular.forEach(function(regularGame) {
-
-                    var team1 = regularGame.home;
-                    var team1Goals = Number(regularGame.homeScore);
-                    var team2 = regularGame.visitor;
-                    var team2Goals = Number(regularGame.visitorScore);
-                    if (!matrix[team1]) {
-                        var team1Init = initializeTeam(team1);
-                        matrix[team1] = team1Init;
-                        sortable.push(matrix[team1]);
-                    }
-                    if (!matrix[team2]) {
-                        var team2Init = initializeTeam(team2);
-                        matrix[team2] = team2Init;
-                        sortable.push(matrix[team2]);
-                    }
-
-                    if (team1Goals > team2Goals) {
-                        matrix[team1].win += 1;
-                        matrix[team1].points += 2;
-                        matrix[team2].loss += 1;
-
-                    } else if (team2Goals > team1Goals) {
-                        matrix[team2].win += 1;
-                        matrix[team2].points += 2;
-                        matrix[team1].loss += 1;
-
-                    } else {
-
-                        matrix[team1].tie += 1;
-                        matrix[team1].points += 1;
-                        matrix[team2].tie += 1;
-                        matrix[team2].points += 1;
-
-                    }
-
-                    matrix[team1].for += team1Goals;
-                    matrix[team2].for += team2Goals;
-
-                    matrix[team1].against += team2Goals;
-                    matrix[team2].against += team1Goals;
-                    matrix[team1].games += 1;
-                    matrix[team2].games += 1;
-                    matrix[team1].diff += (team1Goals - team2Goals);
-                    matrix[team2].diff += (team2Goals - team1Goals);
-
-
-                    matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
-                    matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
-
-
-                });
-
-
-                res.json(sortable);
+                if (standings) {
+                    res.json(standings[0]);
+                }
             }
+        })
 
-        });
 
 
     });
@@ -417,6 +602,8 @@ module.exports = function(app) {
 
     });
 
+
+
     // sample api route
     app.get('/api/games', function(req, res) {
         // use mongoose to get all games in the database
@@ -438,52 +625,79 @@ module.exports = function(app) {
         var gameModels = [];
 
         var toSave = [];
-
-        async.eachSeries(games, function(game, callback) {
-            Game.find({
-
-
-                'gameId': game.gameId
+        var allTeams = Team.find().exec().then(function(teams) {
+            console.log(JSON.stringify(teams, null, 4));
+            async.eachSeries(games, function(game, callback) {
+                Game.find({
 
 
-            }, function(err, existingGames) {
-                if (!err) {
-                    if (existingGames.length === 0) {
-                        var gameModel = new Game({
-                            home: game.home,
-                            visitor: game.visitor,
-                            homeScore: game.homeScore,
-                            visitorScore: game.visitorScore,
-                            type: game.type,
-                            tournament: game.tournament,
-                            association: game.association,
-                            division: game.division,
-                            gameId: game.gameId
-                        });
-                        gameModel.save(function(doc) {
-                            console.log('created: ' + gameModel.gameId);
-                            gameModels.push(gameModel);
+                    'gameId': game.gameId
+
+
+                }, function(err, existingGames) {
+                    if (!err) {
+                        if (existingGames.length === 0) {
+                            var homeAssociation = teams.filter(function(team) {
+                                return team.name === game.home;
+                            })[0];
+                            if (!homeAssociation) {
+                                console.log('problem with game: ' + JSON.stringify(game, null, 4));
+                                homeAssociation = {};
+                            }
+                            var visitorAssocation = teams.filter(function(team) {
+                                return team.name === game.visitor;
+                            })[0];
+                            if (!visitorAssocation) {
+                                console.log('problem with game: ' + JSON.stringify(game, null, 4));
+                                visitorAssocation = {};
+                            }
+                            var gameModel = new Game({
+                                home: game.home,
+                                visitor: game.visitor,
+                                homeScore: game.homeScore,
+                                visitorScore: game.visitorScore,
+                                type: game.type,
+                                tournament: game.tournament,
+                                association: game.association,
+                                homeAssociation: homeAssociation.association,
+                                visitorAssocation: visitorAssocation.association,
+                                division: game.division,
+                                gameId: game.gameId
+                            });
+                            gameModel.save(function(doc) {
+                                console.log('created: ' + gameModel.gameId);
+                                gameModels.push(gameModel);
+                                callback();
+                            }, function(err) {
+                                console.log(err);
+                                callback()
+                            });
+
+
+
+                        } else {
+                            console.log(game.gameId + ' already exists');
                             callback();
-                        }, function(err) {
-                            console.log(err);
-                            callback()
-                        });
-
-
-
-                    } else {
-                        console.log(game.gameId + ' already exists');
-                        callback();
+                        }
                     }
+
+                });
+
+            }, function(err) {
+                if (!err) {
+                    calculateStandings().then(function() {
+                        console.log('calculated standings')
+                        res.json(gameModels);
+                    }).catch(function(err) {
+                        console.log('something bad happened: ' + err);
+                    });
+
+
+
                 }
-
             });
-
-        }, function(err) {
-            if (!err) {
-                res.json(gameModels);
-            }
         });
+
 
 
 

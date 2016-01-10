@@ -25,6 +25,12 @@
          controller: 'StandingsRsController'
      })
 
+      // standings page that will use the StandingsController
+     .when('/admin/team', {
+         templateUrl: 'views/team-admin.html',
+         controller: 'TeamAdminController'
+     })
+
      // standings page that will use the StandingsController
      .when('/standings', {
          templateUrl: 'views/standings.html',
