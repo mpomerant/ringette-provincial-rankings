@@ -26,6 +26,7 @@ module.exports = function(app) {
             diff: 0,
             winPct: 0,
             oppWinPct: 0,
+            firstPlace: false,
             regularSeason: {
                 games: 0,
                 win: 0,
@@ -122,22 +123,22 @@ module.exports = function(app) {
                                 matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
                                 matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
 
-                                var homeTeam = teams.filter(function(team){
-                                    
+                                var homeTeam = teams.filter(function(team) {
+
                                     return team.name === team1;
                                 });
 
-                                if (homeTeam.length > 0){
-                                    
+                                if (homeTeam.length > 0) {
+
                                     matrix[team1].provincial = homeTeam[0].provincial;
                                 }
-                                var visitorTeam = teams.filter(function(team){
-                                    
+                                var visitorTeam = teams.filter(function(team) {
+
                                     return team.name === team2;
                                 });
 
-                                if (visitorTeam.length > 0){
-                                   
+                                if (visitorTeam.length > 0) {
+
                                     matrix[team2].provincial = visitorTeam[0].provincial;
                                 }
 
@@ -154,13 +155,13 @@ module.exports = function(app) {
 
                             }, function(err, existing) {
                                 if (!err) {
-                                    if (!existing){
+                                    if (!existing) {
                                         var standings = new models.Standings({
-                                        association: association,
-                                        division: 'U14A',
-                                        teams: sortable
-                                    });
-                                        standings.save(function(doc){
+                                            association: association,
+                                            division: 'U14A',
+                                            teams: sortable
+                                        });
+                                        standings.save(function(doc) {
                                             console.log('saved');
                                             callback();
                                         })
@@ -170,27 +171,27 @@ module.exports = function(app) {
                                         oldStandings.teams = sortable;
 
                                         models.Standings.update({
-                                        'association': association
-                                    }, oldStandings, {
-                                        upsert: true
-                                    }, function(err, doc) {
-                                        if (!err) {
-                                            console.log('updated ' + association);
-                                            callback();
-                                        } else {
-                                            console.log('error: ' + err);
-                                            callback();
-                                        }
-                                    });
+                                            'association': association
+                                        }, oldStandings, {
+                                            upsert: true
+                                        }, function(err, doc) {
+                                            if (!err) {
+                                                console.log('updated ' + association);
+                                                callback();
+                                            } else {
+                                                console.log('error: ' + err);
+                                                callback();
+                                            }
+                                        });
 
                                     }
-                                    
-                                    
 
 
-                                   
-                            
-                                    
+
+
+
+
+
                                 }
 
                             });
@@ -608,8 +609,11 @@ module.exports = function(app) {
                 // a must be equal to b
                 return 0;
             });
+            
             sortable.forEach(function(team, index) {
-                team.index = index;
+                
+                var association = team.association;
+                
             })
             res.json(sortable); // return all games in JSON format
 

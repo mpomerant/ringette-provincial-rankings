@@ -4,7 +4,21 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
     $scope.predicate = 'points';
     $scope.reverse = true;
 
+    var findFirstTournamentTeam = function(standings) {
+        var result = {
+            points: 0
+        };
+        if (standings && standings.teams) {
+            standings.teams.forEach(function(team) {
+                if (team.provincial && (team.points > result.points)) {
+                    result = team;
+                }
+            });
+        }
 
+        console.log('First Place: ' + JSON.stringify(result, null, 4));
+        return result;
+    }
 
     var getStandings = function() {
 
@@ -12,6 +26,8 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
             var standings = data.filter(function(game) {
                 return game.games > 0;
             })
+
+            var rs = {};
             $scope.standings = standings;
             $scope.standings.forEach(function(team) {
                 var teamId = team.team;
@@ -20,6 +36,35 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
                     team.oppWinPct =
                         Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
                 });
+                var association = team.association;
+                var standings;
+                if (rs[association]) {
+                    standings = rs.association;
+                    if (standings && standings.teams) {
+                        var firstPlace = findFirstTournamentTeam(standings);
+                        if (firstPlace.team === teamId) {
+                            team.firstPlace = true;
+                        } else {
+                            team.firstPlace = false;
+                        }
+                    }
+
+                } else {
+                    Game.regularSeasonStandings(association).success(function(standings) {
+                        rs[association] = standings;
+                        if (standings && standings.teams) {
+                            var firstPlace = findFirstTournamentTeam(standings);
+                            if (firstPlace.team === teamId) {
+                                team.firstPlace = true;
+                            } else {
+                                team.firstPlace = false;
+                            }
+                        }
+                    });
+
+                }
+
+
 
             });
         });
