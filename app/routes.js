@@ -131,6 +131,7 @@ module.exports = function(app) {
                                 if (homeTeam.length > 0) {
 
                                     matrix[team1].provincial = homeTeam[0].provincial;
+                                    matrix[team1].association = homeTeam[0].association;
                                 }
                                 var visitorTeam = teams.filter(function(team) {
 
@@ -140,6 +141,7 @@ module.exports = function(app) {
                                 if (visitorTeam.length > 0) {
 
                                     matrix[team2].provincial = visitorTeam[0].provincial;
+                                    matrix[team2].association = visitorTeam[0].association;
                                 }
 
 

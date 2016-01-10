@@ -8,9 +8,10 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
         var result = {
             points: 0
         };
+        var association = standings.association;
         if (standings && standings.teams) {
             standings.teams.forEach(function(team) {
-                if (team.provincial && (team.points > result.points)) {
+                if (team.provincial && team.association === association && (team.points > result.points)) {
                     result = team;
                 }
             });
