@@ -776,7 +776,7 @@ module.exports = function(app) {
                 var homeExpected = expected.a;
                 var visitorExpected = expected.b;
 
-                var C = 30;
+                var C = game.type === 'RS' ? 30 : 55;
                 var eloHomeScore = 0;
                 var eloVisitorScore = 0;
                 if (homeScore > visitorScore) {
