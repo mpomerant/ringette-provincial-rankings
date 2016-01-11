@@ -35,9 +35,13 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
             $scope.againstData = [$scope.averageGoalsAgainst, $scope.stats.totalAverageGoals]
 
 
+
             $scope.statsForLabels = ['Goals For'];
             $scope.statsForSeries = [$scope.teamId, 'Average'];
             var averageGoals = Number($scope.stats.totalAverageGoals).toFixed(2);
+            $scope.maxFor = Math.floor(Math.max($scope.averageGoalsFor, averageGoals)) + 1;
+            
+            $scope.maxAgainst = Math.floor(Math.max($scope.averageGoalsAgainst, averageGoals)) + 1;
             $scope.statsForData = [
                 [$scope.averageGoalsFor],
                 [averageGoals]
@@ -68,13 +72,26 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
                 
             }
 
-            $scope.statsOptions = {
+            $scope.statsForOptions = {
                 maintainAspectRatio: false,
                 scaleOverride: true,
 
                 // ** Required if scaleOverride is true **
                 // Number - The number of steps in a hard coded scale
-                scaleSteps: 6,
+                scaleSteps: $scope.maxFor,
+                // Number - The value jump in the hard coded scale
+                scaleStepWidth: 1,
+                // Number - The scale starting value
+                scaleStartValue: 0
+            }
+           
+            $scope.statsAgainstOptions = {
+                maintainAspectRatio: false,
+                scaleOverride: true,
+
+                // ** Required if scaleOverride is true **
+                // Number - The number of steps in a hard coded scale
+                scaleSteps: $scope.maxAgainst,
                 // Number - The value jump in the hard coded scale
                 scaleStepWidth: 1,
                 // Number - The scale starting value
@@ -86,7 +103,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
 
 
     var populateGraph = function() {
-        console.log('populate Grapsh: ' + JSON.stringify($scope.regularSeason, null, 4));
+        //console.log('populate Grapsh: ' + JSON.stringify($scope.regularSeason, null, 4));
         $scope.labels = $scope.regularSeason.map(function(game, index, array) {
             return 'Game ' + (index + 1);
         });
