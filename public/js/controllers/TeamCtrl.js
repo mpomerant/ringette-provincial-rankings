@@ -6,6 +6,12 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
     $scope.winPct;
     $scope.regularSeason;
     $scope.teamId = $routeParams.teamId;
+    $scope.stats;
+    $scope.record;
+    $scope.regularSeasonRecord;
+    $scope.averageGoalsFor;
+    $scope.averageGoalsAgainst;
+
 
 
     var getGames = function() {
@@ -17,9 +23,67 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
             $scope.regularSeason = data.regularSeason;
             $scope.winPct = Number(data.record.pct).toFixed(3);
             $scope.oppWinPct = Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
+            $scope.stats = data.stats;
+            $scope.record = data.record;
+            $scope.regularSeasonRecord = data.regularSeasonRecord;
+            var goalsFor = $scope.record.for+$scope.regularSeasonRecord.for;
+            var goalsAgainst = $scope.record.against + $scope.regularSeasonRecord.against;
+            var games = $scope.record.win + $scope.record.loss + $scope.record.tie + $scope.regularSeasonRecord.win + $scope.regularSeasonRecord.loss + $scope.regularSeasonRecord.tie;
+            $scope.averageGoalsFor = Number(goalsFor / games).toFixed(2);
+            $scope.averageGoalsAgainst = Number(goalsAgainst / games).toFixed(2);
+            $scope.forData = [$scope.averageGoalsFor, $scope.stats.totalAverageGoals]
+            $scope.againstData = [$scope.averageGoalsAgainst, $scope.stats.totalAverageGoals]
+
+
+            $scope.statsForLabels = ['Goals For'];
+            $scope.statsForSeries = [$scope.teamId, 'Average'];
+            var averageGoals = Number($scope.stats.totalAverageGoals).toFixed(2);
+            $scope.statsForData = [
+                [$scope.averageGoalsFor],
+                [averageGoals]
+            ];
+
+            $scope.statsAgainstLabels = ['Goals For'];
+            $scope.statsAgainstSeries = [$scope.teamId, 'Average'];
+
+            $scope.statsAgainstData = [
+                [$scope.averageGoalsAgainst],
+                [averageGoals]
+            ];
+
+            $scope.statsForColors = [{ // default
+                "fillColor": "rgba(57, 120, 43, 1)"
+            }, { // default
+                "fillColor": "rgba(222, 222, 222, 1)"
+            }]
+
+            $scope.statsAgainstColors = [{ // default
+                "fillColor": "rgba(234, 108, 108, 1)"
+            }, { // default
+                "fillColor": "rgba(222, 222, 222, 1)"
+            }]
+
+            $scope.options = {
+                maintainAspectRatio: false,
+                
+            }
+
+            $scope.statsOptions = {
+                maintainAspectRatio: false,
+                scaleOverride: true,
+
+                // ** Required if scaleOverride is true **
+                // Number - The number of steps in a hard coded scale
+                scaleSteps: 6,
+                // Number - The value jump in the hard coded scale
+                scaleStepWidth: 1,
+                // Number - The scale starting value
+                scaleStartValue: 0
+            }
             populateGraph();
         });
     }
+
 
     var populateGraph = function() {
         console.log('populate Grapsh: ' + JSON.stringify($scope.regularSeason, null, 4));

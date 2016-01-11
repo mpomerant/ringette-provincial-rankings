@@ -31,9 +31,20 @@
     </div>
 </div>
 <div class="row">
-	<h2>Regular Season Winning Percentage by Game</h2>
-    <div class="col-md-8 col-xs-12">
-        <canvas id="line" class="chart chart-line" chart-options="options" chart-data="data" chart-labels="labels" chart-legend="true" chart-series="series" chart-click="onClick">
+    <div class="col-xs-6">
+        <h2>Regular Season Winning Percentage</h2>
+        <canvas id="line"  class="chart chart-line" chart-options="options" chart-legend="false" chart-data="data" chart-labels="labels" chart-legend="'false'" chart-series="series" chart-options="options" chart-click="onClick">
+        </canvas>
+    </div>
+
+    <div class="col-md-3 col-xs-6">
+        <h2>Goals For</h2>
+        <canvas id="bar"  height="250px" class="chart chart-bar" chart-data="statsForData" chart-labels="statsForLabels" chart-series="statsForSeries" chart-options="statsOptions" chart-colours="statsForColors">
+        </canvas>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <h2>Goals Against</h2>
+        <canvas id="bar" height="250px" class="chart chart-bar" chart-data="statsAgainstData" chart-labels="statsAgainstLabels" chart-series="statsAgainstSeries" chart-options="statsOptions" chart-colours="statsAgainstColors">
         </canvas>
     </div>
 </div>
@@ -41,7 +52,7 @@
 <div class="row">
     <h2>Regular Season Played</h2>
     <table class="table gametable">
-    <tr>
+        <tr>
             <th style="width: 40%; font-size: 1.25em">Home</th>
             <th style="width: 10%" style='font-size: 1.25em'></th>
             <th style="width: 40%; font-size: 1.25em">Visitor</th>
@@ -55,20 +66,19 @@
         </tr>
     </table>
 </div>
-
 <br/>
 <div class="row">
     <h2>Tournament Games Played</h2>
     <table class="table gametable">
-    	<tr>
-    		<th style="width: 20%; font-size: 1.25em">Tournament</th>
+        <tr>
+            <th style="width: 20%; font-size: 1.25em">Tournament</th>
             <th style="width: 30%; font-size: 1.25em">Home</th>
             <th style="width: 10%" style='font-size: 1.25em'></th>
             <th style="width: 30%; font-size: 1.25em">Visitor</th>
             <th style="width: 10%" style='font-size: 1.25em'></th>
         </tr>
         <tr ng-repeat="game in games.games">
-        	<td style="width: 20%; font-size: 1.25em" style='font-size: 1.25em'>{{game.tournament}}</td>
+            <td style="width: 20%; font-size: 1.25em" style='font-size: 1.25em'>{{game.tournament}}</td>
             <td style="width: 30%"><a style='font-size: 1.25em' ng-href="/team/{{game.home}}">{{game.home}}</a></td>
             <td style="width: 10%" style='font-size: 1.25em'>{{game.homeScore}}</td>
             <td style="width: 30%"><a style='font-size: 1.25em' ng-href="/team/{{game.visitor}}">{{game.visitor}}</a></td>

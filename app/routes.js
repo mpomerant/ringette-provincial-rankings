@@ -627,11 +627,24 @@ module.exports = function(app) {
             var sortable = results.sortable;
 
             sortable.sort(function(a, b) {
-                if (a.points > b.points) {
+                if (a.winPct > b.winPct) {
                     return -1;
-                }
-                if (a.points < b.points) {
+                } else if (a.winPct < b.winPct) {
                     return 1;
+                } else {
+                    if (a.points > b.points) {
+                        return -1;
+                    } else if (a.points < b.points) {
+                        return 1;
+                    } else {
+                        if (a.diff > b.diff) {
+                            return -1;
+                        } else if (a.diff < b.diff) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
                 }
                 // a must be equal to b
                 return 0;
