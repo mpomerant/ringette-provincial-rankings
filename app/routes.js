@@ -1,6 +1,7 @@
 var Game = require('./models/gameResult');
 var Team = require('./models/team');
 var models = require('./models/standings')();
+var Ratings = require('./models/ratings');
 var path = require('path');
 var async = require('async');
 module.exports = function(app) {
@@ -47,6 +48,7 @@ module.exports = function(app) {
 
 
     }
+
 
 
 
@@ -676,7 +678,182 @@ module.exports = function(app) {
 
     });
 
+    var getAllRatings = function() {
+        return Ratings.find().exec().then(function(ratings) {
+            return ratings;
+        });
+    }
 
+    var getAllGames = function() {
+        return Game.find().exec().then(function(games) {
+            return games;
+        });
+    }
+
+    var getAllTeams = function() {
+
+        return Team.find().exec().then(function(teams) {
+            return teams;
+        });
+    }
+
+
+    var printTeams = function(teams) {
+
+        console.log(JSON.stringify(teams));
+        return teams;
+
+
+    }
+    var eloTable = {
+        0: 0.5,
+        20: 0.53,
+        40: 0.58,
+        60: 0.62,
+        80: 0.66,
+        100: 0.69,
+        120: 0.73,
+        140: 0.76,
+        160: 0.79,
+        180: 0.82,
+        200: 0.84,
+        300: 0.93,
+        400: 0.97
+    }
+    var expectedScore = function(diff) {
+        var inv = diff < 0;
+        var abs = Math.abs(diff);
+        if (abs > 400) {
+            abs = 400;
+        }
+        for (var x in eloTable) {
+            if (x >= abs) {
+                if (inv) {
+                    return 1 - eloTable[x];
+                } else {
+                    return eloTable[x];
+                }
+
+            }
+        }
+    }
+    var eloDiff = function(score1, score2) {
+
+
+        var r1 = expectedScore(score1 - score2);
+        var r2 = expectedScore(score2 - score1);
+
+
+        return {
+            a: r1,
+            b: r2
+        };
+    }
+
+    var sortTeams = function() {
+
+        return getAllGames().then(function(games) {
+            var elo = {};
+            console.log('games: ' + games.length);
+            games.forEach(function(game) {
+                var homeTeam = game.home;
+                var visitorTeam = game.visitor;
+                var homeScore = Number(game.homeScore);
+                var visitorScore = Number(game.visitorScore);
+                if (!elo[homeTeam]) {
+                    elo[homeTeam] = 1500;
+                }
+
+                if (!elo[visitorTeam]) {
+                    elo[visitorTeam] = 1500;
+                }
+
+                var homeElo = elo[homeTeam];
+                var visitorElo = elo[visitorTeam];
+
+
+                var expected = eloDiff(homeElo, visitorElo);
+                var homeExpected = expected.a;
+                var visitorExpected = expected.b;
+
+                var C = 30;
+                var eloHomeScore = 0;
+                var eloVisitorScore = 0;
+                if (homeScore > visitorScore) {
+                    eloHomeScore = 1;
+                    eloVisitorScore = 0;
+                } else if (homeScore < visitorScore) {
+                    eloHomeScore = 0;
+                    eloVisitorScore = 1;
+                } else {
+                    eloHomeScore = 0.5;
+                    eloVisitorScore = 0.5;
+                }
+
+
+                var newHomeElo = homeElo + (C * (eloHomeScore - homeExpected));
+                var newVisitorElo = visitorElo + (C * (eloVisitorScore - visitorExpected));
+
+                elo[homeTeam] = newHomeElo;
+                //console.log(homeTeam + ': ' + newHomeElo);
+                elo[visitorTeam] = newVisitorElo;
+                //console.log(visitorTeam + ': ' + newVisitorElo);
+
+
+
+            });
+            //console.log(elo);
+            var eloArray = [];
+            for (var team in elo) {
+
+                eloArray.push({
+                    team: team,
+                    rating: elo[team]
+                })
+            }
+
+            eloArray.sort(function(a, b) {
+                return b.rating - a.rating;
+
+            });
+            return eloArray;
+
+
+        });
+
+
+    }
+
+    app.get('/api/ratings', function(req, res) {
+        var allTeams = {};
+        getAllTeams().then(function(teams) {
+            teams.forEach(function(team) {
+                allTeams[team.name] = team;
+            });
+
+            console.log(allTeams);
+            return allTeams;
+        }).then(sortTeams).then(function(elo) {
+            //console.log('printing: ' + JSON.stringify(elo, null, 4));
+            var resultElo = elo.map(function(rating) {
+                //console.log('printing: ' + JSON.stringify(rating, null, 4));
+                try {
+                    var tmpRating = rating;
+                    
+                    tmpRating.rating = Number(tmpRating.rating).toFixed(1);
+                    tmpRating.provincial = allTeams[rating.team].provincial;
+                } catch (e) {
+                    console.log(e);
+                }
+
+
+                return tmpRating;
+            });
+
+            res.json(resultElo);
+        });
+
+    });
 
     // sample api route
     app.get('/api/games', function(req, res) {

@@ -1,0 +1,32 @@
+
+<div class="row">
+    <div class="form-group">
+        <label for="provincial">Show Only Provincial Teams:</label>
+        <input ng-model="showAll" ng-change="updateIndex()" type="checkbox" class="form-control" id="provincial">
+    </div>
+</div>
+<h2>Power Rankings</h2>
+<div class="row">
+    <table class="table standingstable">
+        <thead>
+            <tr>
+                <th class="centerText">
+                    <span style='font-size: 1.25em'>Team</span>
+                </th>
+                <th class="centerText">
+                    <span style='font-size: 1.25em'>Team</span>
+                </th>
+                <th class="centerText">
+                    <span style='font-size: 1.25em'>Rating</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-class="{provincial: team.provincial}" ng-show="!showAll || team.provincial" ng-repeat="team in rankings | orderBy:'rating':true">
+                <td style='font-size: 1.25em' class="centerText">{{$index + 1}}</td>
+                <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
+                <td style='font-size: 1.25em' class="centerText">{{team.rating}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -9,5 +9,6 @@ angular.module('sampleApp', [
     'GameService', 
     'TeamService',
     'TeamAdminCtrl',
+    'PowerRankCtrl',
     'chart.js'
 ]);

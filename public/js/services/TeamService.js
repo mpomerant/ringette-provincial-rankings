@@ -2,6 +2,10 @@ angular.module('TeamService', []).factory('Team', ['$http', function($http) {
 
     return {
 
+        rank: function(){
+            return $http.get('/api/ratings');
+        },
+
         team: function(id) {
             return $http.get('/api/team/' + id);
         },

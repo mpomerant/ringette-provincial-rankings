@@ -30,6 +30,11 @@
          templateUrl: 'views/team-admin.html',
          controller: 'TeamAdminController'
      })
+      // standings page that will use the StandingsController
+     .when('/ranking', {
+         templateUrl: 'views/power-ranking.html',
+         controller: 'PowerRankController'
+     })
 
      // standings page that will use the StandingsController
      .when('/standings', {
