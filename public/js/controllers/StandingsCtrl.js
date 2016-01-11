@@ -1,7 +1,8 @@
 angular.module('StandingsCtrl', []).controller('StandingsController', function($scope, Game) {
 
     $scope.standings;
-    $scope.predicate = 'points';
+    $scope.divisionLeaders;
+    $scope.predicate = 'winPct';
     $scope.reverse = true;
 
     var findFirstTournamentTeam = function(standings) {
@@ -28,42 +29,31 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
                 return game.games > 0;
             })
 
-            var rs = {};
-            $scope.standings = standings;
+
+            $scope.standings = standings.filter(function(team) {
+                return !team.firstPlace;
+            });
             $scope.standings.forEach(function(team) {
                 var teamId = team.team;
                 Game.team(teamId).success(function(data) {
                     //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
                     team.oppWinPct =
                         Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
+
                 });
-                var association = team.association;
-                var standings;
-                if (rs[association]) {
-                    standings = rs.association;
-                    if (standings && standings.teams) {
-                        var firstPlace = findFirstTournamentTeam(standings);
-                        if (firstPlace.team === teamId) {
-                            team.firstPlace = true;
-                        } else {
-                            team.firstPlace = false;
-                        }
-                    }
+            });
 
-                } else {
-                    Game.regularSeasonStandings(association).success(function(standings) {
-                        rs[association] = standings;
-                        if (standings && standings.teams) {
-                            var firstPlace = findFirstTournamentTeam(standings);
-                            if (firstPlace.team === teamId) {
-                                team.firstPlace = true;
-                            } else {
-                                team.firstPlace = false;
-                            }
-                        }
-                    });
+            $scope.divisionLeaders = standings.filter(function(team) {
+                return team.firstPlace;
+            });
+            $scope.divisionLeaders.forEach(function(team) {
+                var teamId = team.team;
+                Game.team(teamId).success(function(data) {
+                    //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
+                    team.oppWinPct =
+                        Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
 
-                }
+                });
 
 
 

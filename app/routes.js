@@ -222,6 +222,7 @@ module.exports = function(app) {
     }
 
 
+
     var getTeamMatrix = function() {
         return new Promise(function(resolve, reject) {
             var matrix = {};
@@ -232,150 +233,174 @@ module.exports = function(app) {
             var tournamentGoals = 0;
             var regularGamesCount = 0;
             var tournamentGamesCount = 0;
-            Game.find().exec().then(function(games) {
+            var allTeams = Team.find().exec().then(function(teams) {
+                Game.find().exec().then(function(games) {
 
 
 
-                var playoff = games.filter(function(game) {
-                    return game.type !== 'RS';
+                    var playoff = games.filter(function(game) {
+                        return game.type !== 'RS';
+                    });
+                    var regular = games.filter(function(game) {
+                        return game.type === 'RS';
+                    });
+                    allGames = playoff;
+                    regularSeasonGames = regular;
+                    regularGamesCount = regular.length;
+                    tournamentGamesCount = playoff.length;
+                    regular.forEach(function(regularGame) {
+
+                        var team1 = regularGame.home;
+                        var team1Goals = Number(regularGame.homeScore);
+                        var team2 = regularGame.visitor;
+                        var team2Goals = Number(regularGame.visitorScore);
+                        regularGoals += team1Goals;
+                        regularGoals += team2Goals;
+
+                        if (!matrix[team1]) {
+                            var team1Init = initializeTeam(team1);
+                            matrix[team1] = team1Init;
+                            sortable.push(matrix[team1]);
+                        }
+                        if (!matrix[team2]) {
+                            var team2Init = initializeTeam(team2);
+                            matrix[team2] = team2Init;
+                            sortable.push(matrix[team2]);
+                        }
+
+                        if (team1Goals > team2Goals) {
+                            matrix[team1].regularSeason.win += 1;
+                            matrix[team1].regularSeason.points += 2;
+                            matrix[team2].regularSeason.loss += 1;
+
+                        } else if (team2Goals > team1Goals) {
+                            matrix[team2].regularSeason.win += 1;
+                            matrix[team2].regularSeason.points += 2;
+                            matrix[team1].regularSeason.loss += 1;
+
+                        } else {
+
+                            matrix[team1].regularSeason.tie += 1;
+                            matrix[team1].regularSeason.points += 1;
+                            matrix[team2].regularSeason.tie += 1;
+                            matrix[team2].regularSeason.points += 1;
+
+                        }
+
+                        matrix[team1].regularSeason.for += team1Goals;
+                        matrix[team2].regularSeason.for += team2Goals;
+
+                        matrix[team1].regularSeason.against += team2Goals;
+                        matrix[team2].regularSeason.against += team1Goals;
+                        matrix[team1].regularSeason.games += 1;
+                        matrix[team2].regularSeason.games += 1;
+                        matrix[team1].regularSeason.diff += (team1Goals - team2Goals);
+                        matrix[team2].regularSeason.diff += (team2Goals - team1Goals);
+
+                        matrix[team1].regularSeason.winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
+                        matrix[team2].regularSeason.winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
+
+                        matrix[team1].association = regularGame.association;
+                        matrix[team2].association = regularGame.association;
+
+                    });
+
+
+                    playoff.forEach(function(result) {
+
+                        var team1 = result.home;
+                        var team1Goals = Number(result.homeScore);
+                        var team2 = result.visitor;
+                        var team2Goals = Number(result.visitorScore);
+                        tournamentGoals += team1Goals;
+                        tournamentGoals += team2Goals;
+
+                        if (!matrix[team1]) {
+                            var team1Init = initializeTeam(team1);
+                            matrix[team1] = team1Init;
+                            sortable.push(matrix[team1]);
+                        }
+                        if (!matrix[team2]) {
+                            var team2Init = initializeTeam(team2);
+                            matrix[team2] = team2Init;
+                            sortable.push(matrix[team2]);
+                        }
+
+
+
+                        if (team1Goals > team2Goals) {
+                            matrix[team1].win += 1;
+                            matrix[team1].points += 2;
+                            matrix[team2].loss += 1;
+
+                        } else if (team2Goals > team1Goals) {
+                            matrix[team2].win += 1;
+                            matrix[team2].points += 2;
+                            matrix[team1].loss += 1;
+
+                        } else {
+
+                            matrix[team1].tie += 1;
+                            matrix[team1].points += 1;
+                            matrix[team2].tie += 1;
+                            matrix[team2].points += 1;
+
+                        }
+
+                        matrix[team1].for += team1Goals;
+                        matrix[team2].for += team2Goals;
+
+                        matrix[team1].against += team2Goals;
+                        matrix[team2].against += team1Goals;
+                        matrix[team1].games += 1;
+                        matrix[team2].games += 1;
+                        matrix[team1].diff += (team1Goals - team2Goals);
+                        matrix[team2].diff += (team2Goals - team1Goals);
+
+                        matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
+                        matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
+                        var homeTeam = teams.filter(function(team) {
+
+                            return team.name === team1;
+                        });
+
+                        if (homeTeam.length > 0) {
+
+                            matrix[team1].provincial = homeTeam[0].provincial;
+                            matrix[team1].association = homeTeam[0].association;
+                        }
+                        var visitorTeam = teams.filter(function(team) {
+
+                            return team.name === team2;
+                        });
+
+                        if (visitorTeam.length > 0) {
+
+                            matrix[team2].provincial = visitorTeam[0].provincial;
+                            matrix[team2].association = visitorTeam[0].association;
+                        }
+
+
+                    });
+
+
+                }).then(function() {
+
+                    resolve({
+                        matrix: matrix,
+                        sortable: sortable,
+                        allGames: allGames,
+                        regularSeasonGames: regularSeasonGames,
+                        regularGoals: regularGoals,
+                        tournamentGoals: tournamentGoals,
+                        regularGamesCount: regularGamesCount,
+                        tournamentGamesCount: tournamentGamesCount
+
+                    });
+
                 });
-                var regular = games.filter(function(game) {
-                    return game.type === 'RS';
-                });
-                allGames = playoff;
-                regularSeasonGames = regular;
-                regularGamesCount = regular.length;
-                tournamentGamesCount = playoff.length;
-                regular.forEach(function(regularGame) {
-
-                    var team1 = regularGame.home;
-                    var team1Goals = Number(regularGame.homeScore);
-                    var team2 = regularGame.visitor;
-                    var team2Goals = Number(regularGame.visitorScore);
-                    regularGoals += team1Goals;
-                    regularGoals += team2Goals;
-
-                    if (!matrix[team1]) {
-                        var team1Init = initializeTeam(team1);
-                        matrix[team1] = team1Init;
-                        sortable.push(matrix[team1]);
-                    }
-                    if (!matrix[team2]) {
-                        var team2Init = initializeTeam(team2);
-                        matrix[team2] = team2Init;
-                        sortable.push(matrix[team2]);
-                    }
-
-                    if (team1Goals > team2Goals) {
-                        matrix[team1].regularSeason.win += 1;
-                        matrix[team1].regularSeason.points += 2;
-                        matrix[team2].regularSeason.loss += 1;
-
-                    } else if (team2Goals > team1Goals) {
-                        matrix[team2].regularSeason.win += 1;
-                        matrix[team2].regularSeason.points += 2;
-                        matrix[team1].regularSeason.loss += 1;
-
-                    } else {
-
-                        matrix[team1].regularSeason.tie += 1;
-                        matrix[team1].regularSeason.points += 1;
-                        matrix[team2].regularSeason.tie += 1;
-                        matrix[team2].regularSeason.points += 1;
-
-                    }
-
-                    matrix[team1].regularSeason.for += team1Goals;
-                    matrix[team2].regularSeason.for += team2Goals;
-
-                    matrix[team1].regularSeason.against += team2Goals;
-                    matrix[team2].regularSeason.against += team1Goals;
-                    matrix[team1].regularSeason.games += 1;
-                    matrix[team2].regularSeason.games += 1;
-                    matrix[team1].regularSeason.diff += (team1Goals - team2Goals);
-                    matrix[team2].regularSeason.diff += (team2Goals - team1Goals);
-
-                    matrix[team1].regularSeason.winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
-                    matrix[team2].regularSeason.winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
-                    matrix[team1].association = regularGame.association;
-                    matrix[team2].association = regularGame.association;
-
-                });
-
-
-                playoff.forEach(function(result) {
-
-                    var team1 = result.home;
-                    var team1Goals = Number(result.homeScore);
-                    var team2 = result.visitor;
-                    var team2Goals = Number(result.visitorScore);
-                    tournamentGoals += team1Goals;
-                    tournamentGoals += team2Goals;
-
-                    if (!matrix[team1]) {
-                        var team1Init = initializeTeam(team1);
-                        matrix[team1] = team1Init;
-                        sortable.push(matrix[team1]);
-                    }
-                    if (!matrix[team2]) {
-                        var team2Init = initializeTeam(team2);
-                        matrix[team2] = team2Init;
-                        sortable.push(matrix[team2]);
-                    }
-
-
-
-                    if (team1Goals > team2Goals) {
-                        matrix[team1].win += 1;
-                        matrix[team1].points += 2;
-                        matrix[team2].loss += 1;
-
-                    } else if (team2Goals > team1Goals) {
-                        matrix[team2].win += 1;
-                        matrix[team2].points += 2;
-                        matrix[team1].loss += 1;
-
-                    } else {
-
-                        matrix[team1].tie += 1;
-                        matrix[team1].points += 1;
-                        matrix[team2].tie += 1;
-                        matrix[team2].points += 1;
-
-                    }
-
-                    matrix[team1].for += team1Goals;
-                    matrix[team2].for += team2Goals;
-
-                    matrix[team1].against += team2Goals;
-                    matrix[team2].against += team1Goals;
-                    matrix[team1].games += 1;
-                    matrix[team2].games += 1;
-                    matrix[team1].diff += (team1Goals - team2Goals);
-                    matrix[team2].diff += (team2Goals - team1Goals);
-
-                    matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
-                    matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
-
-
-                });
-
-
-            }).then(function() {
-
-                resolve({
-                    matrix: matrix,
-                    sortable: sortable,
-                    allGames: allGames,
-                    regularSeasonGames: regularSeasonGames,
-                    regularGoals: regularGoals,
-                    tournamentGoals: tournamentGoals,
-                    regularGamesCount: regularGamesCount,
-                    tournamentGamesCount: tournamentGamesCount
-
-                });
-
             });
+
         });
 
 
@@ -611,11 +636,25 @@ module.exports = function(app) {
                 // a must be equal to b
                 return 0;
             });
-            
+
+            var associations = {
+                'Eastern': false,
+                'Western': false,
+                'Central': false,
+                'Southern': false,
+                'North East': false
+            };
+
             sortable.forEach(function(team, index) {
-                
+
                 var association = team.association;
-                
+                console.log('Team: ' + team.team + ' Association: ' + team.association);
+
+                if (!associations[association]) {
+                    team.firstPlace = true;
+                    associations[association] = true;
+                }
+
             })
             res.json(sortable); // return all games in JSON format
 
