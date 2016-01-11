@@ -11,6 +11,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
     $scope.regularSeasonRecord;
     $scope.averageGoalsFor;
     $scope.averageGoalsAgainst;
+    $scope.vsMatrix = [];
 
 
 
@@ -40,7 +41,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
             $scope.statsForSeries = [$scope.teamId, 'Average'];
             var averageGoals = Number($scope.stats.totalAverageGoals).toFixed(2);
             $scope.maxFor = Math.floor(Math.max($scope.averageGoalsFor, averageGoals)) + 1;
-            
+
             $scope.maxAgainst = Math.floor(Math.max($scope.averageGoalsAgainst, averageGoals)) + 1;
             $scope.statsForData = [
                 [$scope.averageGoalsFor],
@@ -69,7 +70,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
 
             $scope.options = {
                 maintainAspectRatio: false,
-                
+
             }
 
             $scope.statsForOptions = {
@@ -84,7 +85,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
                 // Number - The scale starting value
                 scaleStartValue: 0
             }
-           
+
             $scope.statsAgainstOptions = {
                 maintainAspectRatio: false,
                 scaleOverride: true,
@@ -98,10 +99,72 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
                 scaleStartValue: 0
             }
             populateGraph();
+            populateMatrix();
         });
+    }
+    var MatrixTeam = function(name) {
+        var self = this;
+        self.name = name;
+        self.win = 0;
+        self.loss = 0;
+        self.tie = 0;
+        self.for = 0;
+        self.against = 0;
+        self.diff = function() {
+            return self.for-self.against;
+        }
+        self.getRecord = function() {
+            return self.win + '-' + self.loss + '-' + self.tie;
+        }
+
+        self.factor = function() {
+            var games = self.win + self.loss + self.tie;
+            var goals = (self.for-self.against) / games;
+            return Number(self.win - self.loss + goals).toFixed(1);
+        }
+
+        self.class = function() {
+            var factor = self.factor();
+            if (factor > 0) {
+                return 'qualified';
+            } else if (factor < 0) {
+                return 'missed';
+            }
+        }
     }
 
 
+    var populateMatrix = function() {
+        var allGames = [].concat($scope.games.games).concat($scope.games.regularSeason);
+        var matrix = {};
+        allGames.forEach(function(game) {
+            var team1 = game.home;
+            var team1Score = Number(game.homeScore);
+            var team2 = game.visitor;
+            var team2Score = Number(game.visitorScore);
+            var team = team1 === $scope.teamId ? team1 : team2;
+            var otherTeam = team2 === $scope.teamId ? team1 : team2;
+            var teamScore = team1 === $scope.teamId ? team1Score : team2Score;
+            var otherScore = team2 === $scope.teamId ? team1Score : team2Score;
+            var win = teamScore > otherScore ? 1 : 0;
+            var loss = teamScore < otherScore ? 1 : 0;
+            var tie = teamScore === otherScore ? 1 : 0;
+            if (!matrix[otherTeam]) {
+
+
+                matrix[otherTeam] = new MatrixTeam(otherTeam);
+                $scope.vsMatrix.push(matrix[otherTeam]);
+            }
+            matrix[otherTeam].win += win;
+            matrix[otherTeam].loss += loss;
+            matrix[otherTeam].tie += tie;
+            matrix[otherTeam].for += teamScore;
+            matrix[otherTeam].against += otherScore;
+
+        })
+
+        console
+    }
     var populateGraph = function() {
         //console.log('populate Grapsh: ' + JSON.stringify($scope.regularSeason, null, 4));
         $scope.labels = $scope.regularSeason.map(function(game, index, array) {
