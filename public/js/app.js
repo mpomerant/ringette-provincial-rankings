@@ -10,5 +10,6 @@ angular.module('sampleApp', [
     'TeamService',
     'TeamAdminCtrl',
     'PowerRankCtrl',
+    'ComparisonCtrl',
     'chart.js'
 ]);

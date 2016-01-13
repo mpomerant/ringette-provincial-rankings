@@ -163,7 +163,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
 
         })
 
-        console
+        
     }
     var populateGraph = function() {
         //console.log('populate Grapsh: ' + JSON.stringify($scope.regularSeason, null, 4));

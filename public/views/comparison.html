@@ -1,0 +1,38 @@
+<h2>Compare Team</h2>
+<form>
+    <div class="row">
+        <div class="col col-sm-6">
+            <div class="form-group">
+                <label for="team1select">Team 1:</label>
+                <select ng-change="getTeam1Data()" class="form-control" name="team1Select" id="team1select" ng-model="team1">
+                    <option ng-repeat="team in allTeams" value="{{team.name}}">{{team.name}}</option>
+                </select>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                </div>
+                <div class="panel-body">
+                    {{team1Rating}}
+                </div>
+            </div>
+        </div>
+        <div class="col col-sm-6">
+            <div class="form-group">
+                <label for="team2select">Team 2:</label>
+                <select ng-change="getTeam2Data()" class="form-control" name="team2Select" id="team2select" ng-model="team2">
+                    <option ng-repeat="team in allTeams" value="{{team.name}}">{{team.name}}</option>
+                </select>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                </div>
+                <div class="panel-body">
+                    {{team2Rating}}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</form>

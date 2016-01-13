@@ -1,0 +1,36 @@
+{
+    "name": "ringette",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "casper": "^0.1.1",
+        "casperjs": "^1.1.0-beta3",
+        "phantomjs": "^1.9.19"
+    },
+    "dependencies": {
+        "promise": "^7.1.1"
+    },
+    "eslintConfig": {
+        "env": {
+            "node": true,
+            "phantomjs": true
+
+        },
+        "globals": {
+            "document": true,
+            "$": true
+        },
+        "rules": {
+            "quotes": [
+                1,
+                "single"
+            ]
+        }
+    }
+}

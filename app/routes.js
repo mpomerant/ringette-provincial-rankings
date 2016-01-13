@@ -51,7 +51,6 @@ module.exports = function(app) {
 
 
 
-
     var calculateStandings = function() {
         return new Promise(function(resolve, reject) {
 
@@ -825,6 +824,8 @@ module.exports = function(app) {
     }
 
     app.get('/api/ratings', function(req, res) {
+
+
         var allTeams = {};
         getAllTeams().then(function(teams) {
             teams.forEach(function(team) {
@@ -850,7 +851,7 @@ module.exports = function(app) {
                 return tmpRating;
             });
 
-            res.json(resultElo);
+            res.json({rating: resultElo, eloTable: eloTable});
         });
 
     });

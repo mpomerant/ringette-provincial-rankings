@@ -7,6 +7,11 @@
          templateUrl: 'views/home.html',
          controller: 'MainController'
      })
+          // standings page that will use the StandingsController
+     .when('/teams/compare', {
+         templateUrl: 'views/comparison.html',
+         controller: 'ComparisonController'
+     })
 
      .when('/team/:teamId', {
          templateUrl: 'views/team.html',
@@ -35,6 +40,7 @@
          templateUrl: 'views/power-ranking.html',
          controller: 'PowerRankController'
      })
+     
 
      // standings page that will use the StandingsController
      .when('/standings', {
