@@ -72,7 +72,7 @@ module.exports = function(app) {
 
                     }, function(err, regular) {
                         if (!err) {
-                            console.log('after find Games');
+                            
                             var matrix = {};
 
                             var sortable = [];
@@ -181,7 +181,7 @@ module.exports = function(app) {
                                             upsert: true
                                         }, function(err, doc) {
                                             if (!err) {
-                                                console.log('updated ' + association);
+                                                //console.log('updated ' + association);
                                                 callback();
                                             } else {
                                                 console.log('error: ' + err);
@@ -878,6 +878,7 @@ module.exports = function(app) {
 
     var addGame = function(game, callback) {
         var teams = this.teams;
+        var gameModels = this.gameModels;
         Game.find({
 
 
@@ -916,7 +917,7 @@ module.exports = function(app) {
                     });
                     gameModel.save(function(doc) {
                         console.log('created: ' + gameModel.gameId);
-                        this.gameModels.push(gameModel);
+                        gameModels.push(gameModel);
                         callback();
                     }, function(err) {
                         console.log(err);
@@ -939,7 +940,7 @@ module.exports = function(app) {
 
     app.addGames = function(games) {
         return new Promise(function(resolve, reject){
-        console.log('post: ' + JSON.stringify(games, null, 4));
+        //console.log('post: ' + JSON.stringify(games, null, 4));
         var gameModels = [];
 
         var toSave = [];
