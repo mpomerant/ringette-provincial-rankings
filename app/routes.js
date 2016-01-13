@@ -51,7 +51,9 @@ module.exports = function(app) {
 
 
 
+
     var calculateStandings = function() {
+        console.log('recalculating standings');
         return new Promise(function(resolve, reject) {
 
             var allTeams = Team.find().exec().then(function(teams) {
@@ -59,7 +61,7 @@ module.exports = function(app) {
                 var associations = ['Eastern', 'Western', 'Central', 'Southern', 'North East'];
                 async.eachSeries(associations, function(association, callback) {
 
-                    console.log('getting ' + association + ' standings');
+                    
                     Game.find({
 
                         $and: [{
@@ -840,7 +842,7 @@ module.exports = function(app) {
                 //console.log('printing: ' + JSON.stringify(rating, null, 4));
                 try {
                     var tmpRating = rating;
-                    
+
                     tmpRating.rating = Number(tmpRating.rating).toFixed(1);
                     tmpRating.provincial = allTeams[rating.team].provincial;
                 } catch (e) {
@@ -851,7 +853,10 @@ module.exports = function(app) {
                 return tmpRating;
             });
 
-            res.json({rating: resultElo, eloTable: eloTable});
+            res.json({
+                rating: resultElo,
+                eloTable: eloTable
+            });
         });
 
     });
@@ -871,83 +876,105 @@ module.exports = function(app) {
         });
     });
 
+    var addGame = function(game, callback) {
+        var teams = this.teams;
+        Game.find({
 
-    app.post('/api/games', function(req, res) {
-        var games = req.body;
+
+            'gameId': game.gameId
+
+
+        }, function(err, existingGames) {
+            if (!err) {
+                if (existingGames.length === 0) {
+                    var homeAssociation = teams.filter(function(team) {
+                        return team.name === game.home;
+                    })[0];
+                    if (!homeAssociation) {
+                        console.log('problem with game: ' + JSON.stringify(game, null, 4));
+                        homeAssociation = {};
+                    }
+                    var visitorAssocation = teams.filter(function(team) {
+                        return team.name === game.visitor;
+                    })[0];
+                    if (!visitorAssocation) {
+                        console.log('problem with game: ' + JSON.stringify(game, null, 4));
+                        visitorAssocation = {};
+                    }
+                    var gameModel = new Game({
+                        home: game.home,
+                        visitor: game.visitor,
+                        homeScore: game.homeScore,
+                        visitorScore: game.visitorScore,
+                        type: game.type,
+                        tournament: game.tournament,
+                        association: game.association,
+                        homeAssociation: homeAssociation.association,
+                        visitorAssocation: visitorAssocation.association,
+                        division: game.division,
+                        gameId: game.gameId
+                    });
+                    gameModel.save(function(doc) {
+                        console.log('created: ' + gameModel.gameId);
+                        this.gameModels.push(gameModel);
+                        callback();
+                    }, function(err) {
+                        console.log(err);
+                        callback()
+                    });
+
+
+
+                } else {
+                    //console.log(game.gameId + ' already exists');
+                    callback();
+                }
+            }
+
+        });
+
+
+
+    }
+
+    app.addGames = function(games) {
+        return new Promise(function(resolve, reject){
+        console.log('post: ' + JSON.stringify(games, null, 4));
         var gameModels = [];
 
         var toSave = [];
         var allTeams = Team.find().exec().then(function(teams) {
-            console.log(JSON.stringify(teams, null, 4));
-            async.eachSeries(games, function(game, callback) {
-                Game.find({
-
-
-                    'gameId': game.gameId
-
-
-                }, function(err, existingGames) {
-                    if (!err) {
-                        if (existingGames.length === 0) {
-                            var homeAssociation = teams.filter(function(team) {
-                                return team.name === game.home;
-                            })[0];
-                            if (!homeAssociation) {
-                                console.log('problem with game: ' + JSON.stringify(game, null, 4));
-                                homeAssociation = {};
-                            }
-                            var visitorAssocation = teams.filter(function(team) {
-                                return team.name === game.visitor;
-                            })[0];
-                            if (!visitorAssocation) {
-                                console.log('problem with game: ' + JSON.stringify(game, null, 4));
-                                visitorAssocation = {};
-                            }
-                            var gameModel = new Game({
-                                home: game.home,
-                                visitor: game.visitor,
-                                homeScore: game.homeScore,
-                                visitorScore: game.visitorScore,
-                                type: game.type,
-                                tournament: game.tournament,
-                                association: game.association,
-                                homeAssociation: homeAssociation.association,
-                                visitorAssocation: visitorAssocation.association,
-                                division: game.division,
-                                gameId: game.gameId
-                            });
-                            gameModel.save(function(doc) {
-                                console.log('created: ' + gameModel.gameId);
-                                gameModels.push(gameModel);
-                                callback();
-                            }, function(err) {
-                                console.log(err);
-                                callback()
-                            });
-
-
-
-                        } else {
-                            console.log(game.gameId + ' already exists');
-                            callback();
-                        }
-                    }
-
-                });
-
-            }, function(err) {
+            var addGameBind = addGame.bind({
+                teams: teams,
+                gameModels: gameModels
+            });
+            //console.log(JSON.stringify(teams, null, 4));
+            async.eachSeries(games, addGameBind, function(err) {
                 if (!err) {
                     calculateStandings().then(function() {
                         console.log('calculated standings')
-                        res.json(gameModels);
+                        resolve(gameModels);
+                        
                     }).catch(function(err) {
+
                         console.log('something bad happened: ' + err);
+                        reject(err);
                     });
 
 
 
                 }
             });
+        });
+        })
+        
+    }
+    app.post('/api/games', function(req, res) {
+        var games = req.body;
+        app.addGames(games).then(function(gameModels){
+            res.json(gameModels);
+        }).catch(function(err){
+            throw err;
         });
 
 

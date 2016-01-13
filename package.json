@@ -1,33 +1,34 @@
 {
-    "name": "ringette-node-angular",
-    "main": "server.js",
-    "dependencies": {
-        "async": "^1.5.2",
-        "body-parser": "^1.14.2",
-        "express": "^4.13.3",
-        "method-override": "^2.3.5",
-        "mongoose": "^4.3.4",
-        "passport": "^0.3.2",
-        "casperjs": "^1.1.0-beta3",
-        "phantomjs": "^1.9.19",
-        "promise": "^7.1.1"
+  "name": "ringette-node-angular",
+  "main": "server.js",
+  "dependencies": {
+    "async": "^1.5.2",
+    "body-parser": "^1.14.2",
+    "casperjs": "^1.1.0-beta3",
+    "express": "^4.13.3",
+    "method-override": "^2.3.5",
+    "mongoose": "^4.3.4",
+    "node-schedule": "^0.6.0",
+    "passport": "^0.3.2",
+    "phantomjs": "^1.9.19",
+    "promise": "^7.1.1"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "mongo": true,
+      "angular": true
     },
-    "eslintConfig": {
-        "env": {
-            "node": true,
-            "mongo": true,
-            "angular": true
-        },
-        "rules": {
-            "quotes": [
-                1,
-                "single"
-            ]
-        }
-    },
-    "devDependencies": {
-        "eslint": "^1.10.3",
-        "eslint-config-angular": "^0.4.0",
-        "eslint-plugin-angular": "^0.15.0"
+    "rules": {
+      "quotes": [
+        1,
+        "single"
+      ]
     }
+  },
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-angular": "^0.4.0",
+    "eslint-plugin-angular": "^0.15.0"
+  }
 }

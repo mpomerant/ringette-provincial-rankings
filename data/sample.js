@@ -783,8 +783,13 @@ casper.then(function() {
     'use strict';
 
 
+    if (myDelta.length > 0){
+        fs.write(deltaPath, JSON.stringify(myDelta, null, 4), 'w');
 
-    fs.write(deltaPath, JSON.stringify(myDelta, null, 4), 'w');
+    } else {
+        console.log('No new results found.');
+    }
+    
 
 
 
