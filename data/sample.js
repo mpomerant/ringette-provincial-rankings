@@ -18,7 +18,7 @@ var deltaPath = fs.pathJoin(fs.workingDirectory, 'output', 'delta_' + today.getT
 
 var allResults = [];
 var matrix = {};
-var captureCompleted = false;
+var captureCompleted = true;
 
 
 function readResults(filename) {
@@ -33,6 +33,7 @@ function readResults(filename) {
 
 
 }
+
 function convertSouthernNames(teamName) {
     'use strict';
     //self.echo('teamName' + teamName);
@@ -78,6 +79,7 @@ function convertSouthernNames(teamName) {
 
     return result;
 }
+
 function convertScoreToStatsNames(teamName) {
     'use strict';
     //self.echo('teamName' + teamName);
@@ -175,6 +177,7 @@ function getStCatherinesResults() {
                 job.visitor = visitor;
                 job.visitorScore = visitorScore;
                 job.tournament = 'St Catherines';
+                job.gameDate = new Date('Nov 20 2015').toISOString();
                 jobs.push(job);
 
             }
@@ -204,6 +207,7 @@ function getSouthernRegionResults() {
 
         var visitor = row.cells[3].innerText;
         var score = row.cells[4].innerText.split('-');
+        var gameDate = row.cells[1].innerText.trim();
 
         if (score && score.length > 1) {
             var visitorScore = score[0];
@@ -216,6 +220,7 @@ function getSouthernRegionResults() {
             job.visitor = visitor;
             job.visitorScore = visitorScore;
             job.association = 'Southern';
+            job.gameDate = gameDate ? new Date(gameDate).toISOString() : undefined;
             jobs.push(job);
         }
 
@@ -261,6 +266,8 @@ function getOcrrlResults() {
                 }
                 var visitorScore = visitorSplit.substring(visitorSplit.indexOf(':') + 1).trim();
                 var gameId = row.cells[3].querySelector('img').alt;
+                var rawDate = row.cells[2].innerText.trim().split(' ');
+                var gameDate = rawDate.length > 1 ? rawDate[1] : undefined;
 
                 if (homeScore && visitorScore) {
                     var job = {};
@@ -271,6 +278,7 @@ function getOcrrlResults() {
                     job.visitor = visitor;
                     job.visitorScore = visitorScore;
                     job.association = 'Central';
+                    job.gameDate = gameDate ? new Date(gameDate).toISOString() : undefined;
                     jobs.push(job);
                 }
 
@@ -307,6 +315,7 @@ function getWesternRegionResults() {
         var visitor = row.cells[2].innerText;
 
         var visitorScore = row.cells[3].innerText.trim();
+        var gameDate = row.cells[6].innerText.trim();
         if (homeScore && visitorScore) {
             var job = {};
             job.type = type;
@@ -316,6 +325,7 @@ function getWesternRegionResults() {
             job.visitor = visitor;
             job.visitorScore = visitorScore;
             job.association = 'Western';
+            job.gameDate = gameDate ? new Date(gameDate).toISOString() : undefined;
             jobs.push(job);
         }
 
@@ -342,7 +352,7 @@ function getNcrllFirstHalfResults() {
         //home = this.convertNcrllNames(home);
         var homeScore = row.cells[7].innerText.trim();
         var visitor = row.cells[4].innerText;
-
+        var gameDate = row.cells[1].innerText.trim();
         var visitorScore = row.cells[5].innerText.trim();
         if (homeScore && visitorScore) {
             var job = {};
@@ -353,6 +363,7 @@ function getNcrllFirstHalfResults() {
             job.visitor = visitor;
             job.visitorScore = visitorScore;
             job.association = 'Eastern';
+            job.gameDate = gameDate ? new Date(gameDate).toISOString() : undefined;
             jobs.push(job);
         }
 
@@ -389,6 +400,7 @@ function getPickeringResults() {
             job.visitor = visitor;
             job.visitorScore = visitorScore;
             job.tournament = 'Pickering';
+            job.gameDate = new Date('Dec 4 2015').toISOString();
             jobs.push(job);
 
         }
@@ -408,26 +420,43 @@ function getResults(tournament) {
         var row = rows[i];
         var type = row.cells[1].innerText;
         var status = row.cells[13].innerText;
-        if ((type === 'RR' || type === 'SRR') && status === 'Official') {
+        if (status === 'Official') {
             var home = row.cells[7].innerText;
             if (home.indexOf('Place Team') > -1) {
                 home = home.substring(home.indexOf('Place Team') + 'Place Team '.length);
+            } else if (home.indexOf('Semi') > -1) {
+                home = home.substring(home.indexOf('Semi') + 'Semi '.length);
+            } else if (home.indexOf('U14A - 15') > -1) {
+                home = home.substring(home.indexOf('U14A - 15') + 'U14A - 15 '.length);
+            } else if (home.indexOf('U14A-15') > -1) {
+                home = home.substring(home.indexOf('U14A-15') + 'U14A-15 '.length);
             }
             var homeScore = row.cells[8].innerText;
             var visitor = row.cells[5].innerText;
             if (visitor.indexOf('Place Team') > -1) {
                 visitor = visitor.substring(visitor.indexOf('Place Team') + 'Place Team '.length);
+            } else if (visitor.indexOf('Semi') > -1) {
+                visitor = visitor.substring(visitor.indexOf('Semi') + 'Semi '.length);
+            } else if (visitor.indexOf('U14A - 15') > -1) {
+                visitor = visitor.substring(visitor.indexOf('U14A - 15') + 'U14A - 15 '.length);
+            } else if (visitor.indexOf('U14A-15') > -1) {
+                visitor = visitor.substring(visitor.indexOf('U14A-15') + 'U14A-15 '.length);
             }
+
+
             var visitorScore = row.cells[6].innerText;
+            var gameDate = row.cells[2].innerText.trim() + ' ' + tournament.year;
+            console.log('gameDate: ' + gameDate);
             var job = {};
             job.type = type;
-            job.gameId = tournament + row.cells[0].innerText.trim();
+            job.gameId = tournament.name + row.cells[0].innerText.trim();
             job.home = home;
             job.homeScore = homeScore;
             job.visitor = visitor;
             job.visitorScore = visitorScore;
-            job.tournament = tournament;
+            job.tournament = tournament.name;
             job.division = 'U14A';
+            job.gameDate = gameDate ? new Date(gameDate).toISOString() : undefined;
             jobs.push(job);
 
         }
@@ -441,36 +470,44 @@ function getResults(tournament) {
 var tournaments = [{
         url: 'http://www.score2stats.com/20152016/Nepean169363744EF94980AEB870535F64F544/New_S2S/Schedule.aspx',
         name: 'Nepean',
-        complete: true
+        complete: true,
+        year: 2015
     }, {
         url: 'http://www.score2stats.com/20152016/Oshawa6E3D6A7ED54444E1A036EB8A64F567E1/New_S2S/Schedule.aspx',
         name: 'Oshawa',
-        complete: true
+        complete: true,
+        year: 2015
     }, {
         url: 'http://www.score2stats.com/20152016/LondonBC6C6E24D3EE49CBAE81EB585E87D8EA/New_S2S/Schedule.aspx',
         name: 'London',
-        complete: true
+        complete: true,
+        year: 2015
 
     }, {
         url: 'http://www.score2stats.com/20152016/Ottawa00745C612FA84945A1BA3BF596BF0CCD/New_S2S/Schedule.aspx',
         name: 'Ottawa',
-        complete: true
+        complete: true,
+        year: 2015
     },
 
     {
         url: 'http://www.score2stats.com/20152016/Cambridge86596c34772a48a480991fc81be4b2f9/New_S2S/Schedule.aspx',
         name: 'Cambridge',
-        complete: true
+        complete: true,
+        year: 2016
     }, {
         url: 'http://www.score2stats.com/20152016/Whitby691CA6F64B51421D837394EC378457F3/New_S2S/Schedule.aspx',
         name: 'Whitby',
-        complete: true
+        complete: true,
+        year: 2016
     }, {
         url: 'http://www.score2stats.com/20152016/WaterlooB5647E6B10DB41EFA7B6565C0990F800/New_S2S/Schedule.aspx',
-        name: 'Waterloo'
+        name: 'Waterloo',
+        year: 2016
     }, {
         url: 'http://www.score2stats.com/20152016/RichmondHill3AAA6C25181748BB91EF983A52848EE1/New_S2S/Schedule.aspx',
-        name: 'Richmond Hill'
+        name: 'Richmond Hill',
+        year: 2016
     }
 ];
 
@@ -517,6 +554,9 @@ var associations = [{
 
 ];
 var myDelta = [];
+casper.on('remote.message', function(msg) {
+    this.echo('remote: ' + msg);
+})
 casper.start().then(function() {
     'use strict';
     if (!Array.prototype.findIndex) {
@@ -542,42 +582,42 @@ casper.start().then(function() {
         };
     }
     tournaments.forEach(function(tournament) {
-        if (captureCompleted || !tournament.complete){
-                    this.echo(tournament.url);
-        casper.thenOpen(tournament.url);
-        casper.then(function() {
-            this.echo(this.getTitle());
+        if (captureCompleted || !tournament.complete) {
+            this.echo(tournament.url);
+            casper.thenOpen(tournament.url);
+            casper.then(function() {
+                this.echo(this.getTitle());
 
-        });
-
-
-        casper.waitForSelector('select[name="ctl00$ContentPlaceHolder1$DropDownListDivisions"]', function() {
-            this.captureSelector(tournament.name + '.png', 'html');
-        });
-
-
-
-        casper.thenEvaluate(function chooseU14A() {
-
-
-            var $select = $('select[name="ctl00$ContentPlaceHolder1$DropDownListDivisions"]');
-            var option = 'U14 A';
-            $select.val(option);
-            $select.change();
-
-
-        });
-
-        casper.then(function() {
-            this.captureSelector(tournament.name + '_selected.png', 'html');
-            var jobs = this.evaluate(getResults, tournament.name);
-            jobs.forEach(function(game) {
-                game.home = convertScoreToStatsNames(game.home);
-                game.visitor = convertScoreToStatsNames(game.visitor);
             });
-            allResults = allResults.concat(jobs);
 
-        });
+
+            casper.waitForSelector('select[name="ctl00$ContentPlaceHolder1$DropDownListDivisions"]', function() {
+                this.captureSelector(tournament.name + '.png', 'html');
+            });
+
+
+
+            casper.thenEvaluate(function chooseU14A() {
+
+
+                var $select = $('select[name="ctl00$ContentPlaceHolder1$DropDownListDivisions"]');
+                var option = 'U14 A';
+                $select.val(option);
+                $select.change();
+
+
+            });
+
+            casper.then(function() {
+                this.captureSelector(tournament.name + '_selected.png', 'html');
+                var jobs = this.evaluate(getResults, tournament);
+                jobs.forEach(function(game) {
+                    game.home = convertScoreToStatsNames(game.home);
+                    game.visitor = convertScoreToStatsNames(game.visitor);
+                });
+                allResults = allResults.concat(jobs);
+
+            });
 
         }
 
@@ -783,13 +823,13 @@ casper.then(function() {
     'use strict';
 
 
-    if (myDelta.length > 0){
+    if (myDelta.length > 0) {
         fs.write(deltaPath, JSON.stringify(myDelta, null, 4), 'w');
 
     } else {
         console.log('No new results found.');
     }
-    
+
 
 
 

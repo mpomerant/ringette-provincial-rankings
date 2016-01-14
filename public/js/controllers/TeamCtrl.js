@@ -20,7 +20,16 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
 
         Game.team($scope.teamId).success(function(data) {
             //console.log(JSON.stringify(data.regularSeason, null, 4));
+            var teamGames = data.games.map(function(game){
+                game.isPlayoff = game.type === 'GS' || game.type === 'S1' || game.type === 'S2'
+                return game;
+            })
+
+            data.games = teamGames;
+
+            
             $scope.games = data;
+            
             $scope.regularSeason = data.regularSeason;
             $scope.winPct = Number(data.record.pct).toFixed(3);
             $scope.oppWinPct = Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
@@ -35,7 +44,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
             $scope.forData = [$scope.averageGoalsFor, $scope.stats.totalAverageGoals]
             $scope.againstData = [$scope.averageGoalsAgainst, $scope.stats.totalAverageGoals]
 
-
+            
 
             $scope.statsForLabels = ['Goals For'];
             $scope.statsForSeries = [$scope.teamId, 'Average'];

@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 // define our game model
 // module.exports allows us to pass this to other files when it is called
 module.exports = mongoose.model('Game', {
+
     home: {
         type: String,
         default: ''
@@ -46,6 +47,7 @@ module.exports = mongoose.model('Game', {
     gameId: {
         type: String,
         default: ''
-    }
+    },
+    gameDate: Date
 
 });

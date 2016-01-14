@@ -18,6 +18,7 @@ module.exports = function(app) {
         var result = {
             team: team,
             games: 0,
+            qualifyingGames: 0,
             win: 0,
             loss: 0,
             tie: 0,
@@ -61,7 +62,7 @@ module.exports = function(app) {
                 var associations = ['Eastern', 'Western', 'Central', 'Southern', 'North East'];
                 async.eachSeries(associations, function(association, callback) {
 
-                    
+
                     Game.find({
 
                         $and: [{
@@ -72,7 +73,7 @@ module.exports = function(app) {
 
                     }, function(err, regular) {
                         if (!err) {
-                            
+
                             var matrix = {};
 
                             var sortable = [];
@@ -237,7 +238,9 @@ module.exports = function(app) {
             var regularGamesCount = 0;
             var tournamentGamesCount = 0;
             var allTeams = Team.find().exec().then(function(teams) {
-                Game.find().exec().then(function(games) {
+                Game.find().sort({
+                    gameDate: 'asc'
+                }).exec().then(function(games) {
 
 
 
@@ -297,6 +300,8 @@ module.exports = function(app) {
                         matrix[team2].regularSeason.against += team1Goals;
                         matrix[team1].regularSeason.games += 1;
                         matrix[team2].regularSeason.games += 1;
+
+
                         matrix[team1].regularSeason.diff += (team1Goals - team2Goals);
                         matrix[team2].regularSeason.diff += (team2Goals - team1Goals);
 
@@ -333,20 +338,29 @@ module.exports = function(app) {
 
                         if (team1Goals > team2Goals) {
                             matrix[team1].win += 1;
-                            matrix[team1].points += 2;
+                            if (result.type === 'RR' || result.type === 'SRR') {
+                                matrix[team1].points += 2;
+                            }
+
                             matrix[team2].loss += 1;
 
                         } else if (team2Goals > team1Goals) {
                             matrix[team2].win += 1;
-                            matrix[team2].points += 2;
+                            if (result.type === 'RR' || result.type === 'SRR') {
+                                matrix[team2].points += 2;
+                            }
                             matrix[team1].loss += 1;
 
                         } else {
 
                             matrix[team1].tie += 1;
-                            matrix[team1].points += 1;
+
                             matrix[team2].tie += 1;
-                            matrix[team2].points += 1;
+
+                            if (result.type === 'RR' || result.type === 'SRR') {
+                                matrix[team2].points += 1;
+                                matrix[team1].points += 1;
+                            }
 
                         }
 
@@ -357,11 +371,15 @@ module.exports = function(app) {
                         matrix[team2].against += team1Goals;
                         matrix[team1].games += 1;
                         matrix[team2].games += 1;
+                        if (result.type === 'RR' || result.type === 'SRR') {
+                            matrix[team1].qualifyingGames += 1;
+                            matrix[team2].qualifyingGames += 1;
+                        }
                         matrix[team1].diff += (team1Goals - team2Goals);
                         matrix[team2].diff += (team2Goals - team1Goals);
 
-                        matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].games * 2)).toFixed(3);
-                        matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].games * 2)).toFixed(3);
+                        matrix[team1].winPct = Number(matrix[team1].points / (matrix[team1].qualifyingGames * 2)).toFixed(3);
+                        matrix[team2].winPct = Number(matrix[team2].points / (matrix[team2].qualifyingGames * 2)).toFixed(3);
                         var homeTeam = teams.filter(function(team) {
 
                             return team.name === team1;
@@ -525,83 +543,83 @@ module.exports = function(app) {
             var tournamentGoals = result.tournamentGoals;
             var regularGamesCount = result.regularGamesCount;
             var tournamentGamesCount = result.tournamentGamesCount;
+
             Game.find({
-
-                    $or: [{
-                        'home': id
-                    }, {
-                        'visitor': id
-                    }]
-
-                },
-                function(err, docs) {
-                    if (!err) {
-                        var result = {};
-                        var playoff = docs.filter(function(game) {
-                            return game.type !== 'RS';
-                        });
-                        var regular = docs.filter(function(game) {
-                            return game.type === 'RS';
-                        });
-                        result.games = playoff;
-                        result.regularSeason = regular;
-                        var myteam = matrix[id];
-                        result.record = {
-                            win: myteam ? myteam.win : 0,
-                            loss: myteam ? myteam.loss : 0,
-                            tie: myteam ? myteam.tie : 0,
-                            pct: myteam ? Number(myteam.win / (myteam.win + myteam.loss)).toFixed(3) : 0,
-                            for: myteam ? myteam.for : 0,
-                            against: myteam ? myteam.against : 0
-                        }
-                        result.opponentRecord = {
-                            win: 0,
-                            loss: 0,
-                            tie: 0,
-                            points: 0,
-                            games: 0
-                        }
-                        result.regularSeasonRecord = {
-                            win: myteam ? myteam.regularSeason.win : 0,
-                            loss: myteam ? myteam.regularSeason.loss : 0,
-                            tie: myteam ? myteam.regularSeason.tie : 0,
-                            pct: myteam ? Number(myteam.regularSeason.winPct).toFixed(3) : 0,
-                            for: myteam ? myteam.regularSeason.for : 0,
-                            against: myteam ? myteam.regularSeason.against : 0
-                        }
-                        playoff.forEach(function(game) {
-                            var home = game.home;
-                            var visitor = game.visitor;
-                            var team = home === id ? visitor : home;
-                            var record = matrix[team];
-                            result.opponentRecord.win += record.win;
-                            result.opponentRecord.loss += record.loss;
-                            result.opponentRecord.tie += record.tie;
-                            result.opponentRecord.points += (record.win * 2);
-                            result.opponentRecord.points += record.tie;
-                            result.opponentRecord.games += record.tie;
-                            result.opponentRecord.games += record.loss;
-                            result.opponentRecord.games += record.win;
-
-
-
-                        });
-
-
-                        result.stats = {};
-                        result.stats.regularGoals = regularGoals;
-                        result.stats.tournamentGoals = tournamentGoals;
-                        result.stats.regularGamesCount = regularGamesCount;
-                        result.stats.tournamentGamesCount = tournamentGamesCount;
-                        result.stats.regularAverageGoals = regularGoals / regularGamesCount / 2;
-                        result.stats.tournamentAverageGoals = tournamentGoals / tournamentGamesCount / 2;
-                        result.stats.totalAverageGoals = ((regularGoals + tournamentGoals) / (tournamentGamesCount + regularGamesCount)) / 2;
-                        res.json(result);
+                $or: [{
+                    'home': id
+                }, {
+                    'visitor': id
+                }]
+            }).sort({
+                gameDate: 'asc'
+            }).exec(function(err, docs) {
+                if (!err) {
+                    var result = {};
+                    var playoff = docs.filter(function(game) {
+                        return game.type !== 'RS';
+                    });
+                    var regular = docs.filter(function(game) {
+                        return game.type === 'RS';
+                    });
+                    result.games = playoff;
+                    result.regularSeason = regular;
+                    var myteam = matrix[id];
+                    result.record = {
+                        win: myteam ? myteam.win : 0,
+                        loss: myteam ? myteam.loss : 0,
+                        tie: myteam ? myteam.tie : 0,
+                        pct: myteam ? Number(myteam.win / (myteam.win + myteam.loss)).toFixed(3) : 0,
+                        for: myteam ? myteam.for : 0,
+                        against: myteam ? myteam.against : 0
                     }
+                    result.opponentRecord = {
+                        win: 0,
+                        loss: 0,
+                        tie: 0,
+                        points: 0,
+                        games: 0
+                    }
+                    result.regularSeasonRecord = {
+                        win: myteam ? myteam.regularSeason.win : 0,
+                        loss: myteam ? myteam.regularSeason.loss : 0,
+                        tie: myteam ? myteam.regularSeason.tie : 0,
+                        pct: myteam ? Number(myteam.regularSeason.winPct).toFixed(3) : 0,
+                        for: myteam ? myteam.regularSeason.for : 0,
+                        against: myteam ? myteam.regularSeason.against : 0
+                    }
+                    playoff.forEach(function(game) {
+                        var home = game.home;
+                        var visitor = game.visitor;
+                        var team = home === id ? visitor : home;
+                        var record = matrix[team];
+                        result.opponentRecord.win += record.win;
+                        result.opponentRecord.loss += record.loss;
+                        result.opponentRecord.tie += record.tie;
+                        result.opponentRecord.points += (record.win * 2);
+                        result.opponentRecord.points += record.tie;
+                        result.opponentRecord.games += record.tie;
+                        result.opponentRecord.games += record.loss;
+                        result.opponentRecord.games += record.win;
 
+
+
+                    });
+
+
+                    result.stats = {};
+                    result.stats.regularGoals = regularGoals;
+                    result.stats.tournamentGoals = tournamentGoals;
+                    result.stats.regularGamesCount = regularGamesCount;
+                    result.stats.tournamentGamesCount = tournamentGamesCount;
+                    result.stats.regularAverageGoals = regularGoals / regularGamesCount / 2;
+                    result.stats.tournamentAverageGoals = tournamentGoals / tournamentGamesCount / 2;
+                    result.stats.totalAverageGoals = ((regularGoals + tournamentGoals) / (tournamentGamesCount + regularGamesCount)) / 2;
+                    res.json(result);
                 }
-            );
-        })
+
+            });
+
+        });
 
     });
 
@@ -686,9 +704,18 @@ module.exports = function(app) {
     }
 
     var getAllGames = function() {
-        return Game.find().exec().then(function(games) {
-            return games;
+        return Game.find({}).sort({
+            gameDate: 'asc'
+        }).exec(function(err, games) {
+            // if there is an error retrieving, send the error.
+            // nothing after res.send(err) will execute
+            if (err) {
+                throw err;
+            }
+
+            return games; // return all games in JSON format
         });
+
     }
 
     var getAllTeams = function() {
@@ -777,7 +804,7 @@ module.exports = function(app) {
                 var homeExpected = expected.a;
                 var visitorExpected = expected.b;
 
-                var C = game.type === 'RS' ? 30 : 55;
+                var C = game.type === 'RS' ? 30 : game.type === 'GS' ? 65 : game.type === 'S1' || game.type === 'S2' ? 55 : 50;
                 var eloHomeScore = 0;
                 var eloVisitorScore = 0;
                 if (homeScore > visitorScore) {
@@ -863,9 +890,10 @@ module.exports = function(app) {
 
     // sample api route
     app.get('/api/games', function(req, res) {
-        // use mongoose to get all games in the database
-        Game.find(function(err, games) {
-
+        // use mongoose to get all games in the 
+        Game.find({}).sort({
+            gameDate: 'asc'
+        }).exec(function(err, games) {
             // if there is an error retrieving, send the error.
             // nothing after res.send(err) will execute
             if (err) {
@@ -874,6 +902,7 @@ module.exports = function(app) {
 
             res.json(games); // return all games in JSON format
         });
+
     });
 
     var addGame = function(game, callback) {
@@ -902,6 +931,7 @@ module.exports = function(app) {
                         console.log('problem with game: ' + JSON.stringify(game, null, 4));
                         visitorAssocation = {};
                     }
+                    console.log(game.gameDate);
                     var gameModel = new Game({
                         home: game.home,
                         visitor: game.visitor,
@@ -913,7 +943,8 @@ module.exports = function(app) {
                         homeAssociation: homeAssociation.association,
                         visitorAssocation: visitorAssocation.association,
                         division: game.division,
-                        gameId: game.gameId
+                        gameId: game.gameId,
+                        gameDate: new Date(game.gameDate)
                     });
                     gameModel.save(function(doc) {
                         console.log('created: ' + gameModel.gameId);
@@ -939,42 +970,42 @@ module.exports = function(app) {
     }
 
     app.addGames = function(games) {
-        return new Promise(function(resolve, reject){
-        //console.log('post: ' + JSON.stringify(games, null, 4));
-        var gameModels = [];
+        return new Promise(function(resolve, reject) {
+            //console.log('post: ' + JSON.stringify(games, null, 4));
+            var gameModels = [];
 
-        var toSave = [];
-        var allTeams = Team.find().exec().then(function(teams) {
-            var addGameBind = addGame.bind({
-                teams: teams,
-                gameModels: gameModels
+            var toSave = [];
+            var allTeams = Team.find().exec().then(function(teams) {
+                var addGameBind = addGame.bind({
+                    teams: teams,
+                    gameModels: gameModels
+                });
+                //console.log(JSON.stringify(teams, null, 4));
+                async.eachSeries(games, addGameBind, function(err) {
+                    if (!err) {
+                        calculateStandings().then(function() {
+                            console.log('calculated standings')
+                            resolve(gameModels);
+
+                        }).catch(function(err) {
+
+                            console.log('something bad happened: ' + err);
+                            reject(err);
+                        });
+
+
+
+                    }
+                });
             });
-            //console.log(JSON.stringify(teams, null, 4));
-            async.eachSeries(games, addGameBind, function(err) {
-                if (!err) {
-                    calculateStandings().then(function() {
-                        console.log('calculated standings')
-                        resolve(gameModels);
-                        
-                    }).catch(function(err) {
-
-                        console.log('something bad happened: ' + err);
-                        reject(err);
-                    });
-
-
-
-                }
-            });
-        });
         })
-        
+
     }
     app.post('/api/games', function(req, res) {
         var games = req.body;
-        app.addGames(games).then(function(gameModels){
+        app.addGames(games).then(function(gameModels) {
             res.json(gameModels);
-        }).catch(function(err){
+        }).catch(function(err) {
             throw err;
         });
 

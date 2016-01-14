@@ -44,6 +44,10 @@
         <th class="centerText">
             <span style='font-size: 1.25em'>Team</span>
             <span class="sortorder" ng-click="order('team')" ng-class="{reverse:reverse}"></span></th>
+         <th class="centerText">
+            <span style='font-size: 1.25em'>Association</span>
+            </th>
+
         <th class="centerText">
             <span style='font-size: 1.25em'>Games</span>
             <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
@@ -64,6 +68,7 @@
     
     <tr  ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 8 && predicate === 'winPct' && reverse === true}">
         <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
+        <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
         <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>

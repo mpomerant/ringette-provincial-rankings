@@ -1,13 +1,15 @@
 <h2>Tournament Games Played</h2>
 <table class="table table-bordered table-striped">
     <tr>
+        <th style="width: 20%">Date</th>
         <th style="width: 20%">Tournament</th>
-        <th style="width: 30%">Home</th>
+        <th style="width: 20%">Home</th>
         <th style="width: 10%">Score</th>
-        <th style="width: 30%">Visitor</th>
+        <th style="width: 20%">Visitor</th>
         <th style="width: 10%">Score</th>
     </tr>
-    <tr ng-repeat="game in games | orderBy:'tournament'">
+    <tr ng-class="game.isPlayoff ? 'provincial-playoff' : ''" ng-repeat="game in games | orderBy:'gameDate'">
+        <td <style="width: 20%; font-size: 1.25em" ng-bind="game.gameDate | date:'MMM dd yyyy'"></td>
         <td style="width: 20%">{{game.tournament}}</td>
         <td style="width: 30%"><a ng-href="/team/{{game.home}}">{{game.home}}</a></td>
         <td style="width: 10%">{{game.homeScore}}</td>

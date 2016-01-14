@@ -6,6 +6,10 @@
     content: '\25bc';
 }
 
+.provincial-playoff {
+  background-color: #ffb84d !important;
+}
+
 .centerText {
     text-align: center;
 }
