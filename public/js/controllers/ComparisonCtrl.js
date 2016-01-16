@@ -56,7 +56,7 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
 
     $scope.rows = [
         new Stat('Rating', $scope.team1Rating, $scope.team2Rating, true),
-        new Stat('Expected Win', $scope.data[0], $scope.data[1], true),
+        new Stat('Expected', $scope.data[0], $scope.data[1], true),
         new Stat('Win %', $scope.team1WinPct, $scope.team2WinPct, true),
         new Stat('For', $scope.team1WinPct, $scope.team2WinPct, true),
         new Stat('Against', $scope.team1WinPct, $scope.team2WinPct, false),
