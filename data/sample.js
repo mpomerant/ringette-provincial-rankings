@@ -18,7 +18,7 @@ var deltaPath = fs.pathJoin(fs.workingDirectory, 'output', 'delta_' + today.getT
 
 var allResults = [];
 var matrix = {};
-var captureCompleted = true;
+var captureCompleted = false;
 
 
 function readResults(filename) {
@@ -33,6 +33,8 @@ function readResults(filename) {
 
 
 }
+
+
 
 function convertSouthernNames(teamName) {
     'use strict';
@@ -82,9 +84,12 @@ function convertSouthernNames(teamName) {
 
 function convertScoreToStatsNames(teamName) {
     'use strict';
-    //self.echo('teamName' + teamName);
+    if (teamName.indexOf('(') > -1){
+        teamName = teamName.substring(0, teamName.indexOf('('));
+    }
+    teamName = teamName.trim();
     var result = '';
-    switch (teamName.trim()) {
+    switch (teamName) {
         case 'Elora-Fergus':
             result = 'Elora Fergus';
             break;
@@ -422,6 +427,7 @@ function getResults(tournament) {
         var status = row.cells[13].innerText;
         if (status === 'Official') {
             var home = row.cells[7].innerText;
+
             if (home.indexOf('Place Team') > -1) {
                 home = home.substring(home.indexOf('Place Team') + 'Place Team '.length);
             } else if (home.indexOf('Semi') > -1) {

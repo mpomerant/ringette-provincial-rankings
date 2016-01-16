@@ -126,6 +126,8 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.labels = [$scope.team1, $scope.team2];
             $scope.data[0] = $scope.homePct;
             $scope.data[1] = $scope.visitorPct;
+            $scope.rows[1].left = $scope.data[0];
+            $scope.rows[1].right = $scope.data[1];
         }
     }
     $scope.getTeam1Data = function() {
@@ -149,7 +151,7 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.rows[3].left = $scope.team1For;
             $scope.rows[4].left = $scope.team1Against;
             calculateDiff();
-            $scope.rows[1].left = $scope.data[0];
+            
 
         }, function(err) {
             console.log(err);
@@ -175,7 +177,7 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.rows[3].right = $scope.team2For;
             $scope.rows[4].right = $scope.team2Against;
             calculateDiff();
-            $scope.rows[1].right = $scope.data[1];
+            
 
         }, function(err) {
             console.log(err);
