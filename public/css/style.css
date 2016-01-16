@@ -71,6 +71,13 @@
   border: solid #C0C0C0;
 }
 
+.rating-label {
+  font-size: 2em;
+  line-height: 180px;
+  vertical-align: middle;
+
+}
+
 .circle {
   width: 150px;
   height: 150px;

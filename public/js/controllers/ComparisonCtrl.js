@@ -56,8 +56,8 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
     $scope.rows = [
         new Stat('Rating', $scope.team1Rating, $scope.team2Rating, true),
         new Stat('Win %', $scope.team1WinPct, $scope.team2WinPct, true),
-        new Stat('Goals For', $scope.team1WinPct, $scope.team2WinPct, true),
-        new Stat('Goals Against', $scope.team1WinPct, $scope.team2WinPct, false),
+        new Stat('For', $scope.team1WinPct, $scope.team2WinPct, true),
+        new Stat('Against', $scope.team1WinPct, $scope.team2WinPct, false),
 
        
 
@@ -127,8 +127,9 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
     //$scope.team1Loss;
     //$scope.team1Tie;
     //$scope.team1WinPct;
-            $scope.team1For = teams.data.record.for + teams.data.regularSeasonRecord.for;
-            $scope.team1Against = teams.data.record.against + teams.data.regularSeasonRecord.against;
+            var games = $scope.team1Win + $scope.team1Loss + $scope.team1Tie;
+            $scope.team1For = Number((teams.data.record.for + teams.data.regularSeasonRecord.for) / games).toFixed(1);
+            $scope.team1Against = Number((teams.data.record.against + teams.data.regularSeasonRecord.against) / games).toFixed(1);
             $scope.team1WinPct = teams.data.record.pct;
             $scope.rows[0].left = $scope.team1Rating;
             $scope.rows[1].left = $scope.team1WinPct;
@@ -150,9 +151,11 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.team2Win = teams.data.record.win + teams.data.regularSeasonRecord.win;
             $scope.team2Loss = teams.data.record.loss + teams.data.regularSeasonRecord.loss;
             $scope.team2Tie = teams.data.record.tie + teams.data.regularSeasonRecord.tie;
+            
             $scope.team2WinPct = teams.data.record.pct;
-            $scope.team2For = teams.data.record.for + teams.data.regularSeasonRecord.for;
-            $scope.team2Against = teams.data.record.against + teams.data.regularSeasonRecord.against;
+            var games = $scope.team2Win + $scope.team2Loss + $scope.team2Tie;
+            $scope.team2For = Number((teams.data.record.for + teams.data.regularSeasonRecord.for) / games).toFixed(1);
+            $scope.team2Against = Number((teams.data.record.against + teams.data.regularSeasonRecord.against) / games).toFixed(1);
             $scope.rows[0].right = $scope.team2Rating;
             $scope.rows[1].right = $scope.team2WinPct;
             $scope.rows[2].right = $scope.team2For;
