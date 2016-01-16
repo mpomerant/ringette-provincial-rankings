@@ -15,6 +15,7 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
     $scope.team2Data;
     $scope.team1Rating;
     $scope.team2Rating;
+    $scope.data = [0,0];
 
     var Stat = function(name, left, right, high){
         var self = this;
@@ -55,6 +56,7 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
 
     $scope.rows = [
         new Stat('Rating', $scope.team1Rating, $scope.team2Rating, true),
+        new Stat('Expected Win', $scope.data[0], $scope.data[1], true),
         new Stat('Win %', $scope.team1WinPct, $scope.team2WinPct, true),
         new Stat('For', $scope.team1WinPct, $scope.team2WinPct, true),
         new Stat('Against', $scope.team1WinPct, $scope.team2WinPct, false),
@@ -122,7 +124,8 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.homePct = Math.floor(expectedScore(diff) * 100);
             $scope.visitorPct = 100 - $scope.homePct;
             $scope.labels = [$scope.team1, $scope.team2];
-            $scope.data = [$scope.homePct, $scope.visitorPct];
+            $scope.data[0] = $scope.homePct;
+            $scope.data[1] = $scope.visitorPct;
         }
     }
     $scope.getTeam1Data = function() {
@@ -142,10 +145,11 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.team1Against = Number((teams.data.record.against + teams.data.regularSeasonRecord.against) / games).toFixed(1);
             $scope.team1WinPct = teams.data.record.pct;
             $scope.rows[0].left = $scope.team1Rating;
-            $scope.rows[1].left = $scope.team1WinPct;
-            $scope.rows[2].left = $scope.team1For;
-            $scope.rows[3].left = $scope.team1Against;
+            $scope.rows[2].left = $scope.team1WinPct;
+            $scope.rows[3].left = $scope.team1For;
+            $scope.rows[4].left = $scope.team1Against;
             calculateDiff();
+            $scope.rows[1].left = $scope.data[0];
 
         }, function(err) {
             console.log(err);
@@ -167,10 +171,11 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
             $scope.team2For = Number((teams.data.record.for + teams.data.regularSeasonRecord.for) / games).toFixed(1);
             $scope.team2Against = Number((teams.data.record.against + teams.data.regularSeasonRecord.against) / games).toFixed(1);
             $scope.rows[0].right = $scope.team2Rating;
-            $scope.rows[1].right = $scope.team2WinPct;
-            $scope.rows[2].right = $scope.team2For;
-            $scope.rows[3].right = $scope.team2Against;
+            $scope.rows[2].right = $scope.team2WinPct;
+            $scope.rows[3].right = $scope.team2For;
+            $scope.rows[4].right = $scope.team2Against;
             calculateDiff();
+            $scope.rows[1].right = $scope.data[1];
 
         }, function(err) {
             console.log(err);

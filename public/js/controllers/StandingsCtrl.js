@@ -4,6 +4,7 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
     $scope.divisionLeaders;
     $scope.predicate = 'winPct';
     $scope.reverse = true;
+    $scope.showOverall = true;
 
     var findFirstTournamentTeam = function(standings) {
         var result = {
@@ -18,7 +19,7 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
             });
         }
 
-        console.log('First Place: ' + JSON.stringify(result, null, 4));
+        //console.log('First Place: ' + JSON.stringify(result, null, 4));
         return result;
     }
 

@@ -1,4 +1,10 @@
 <h2>U14A Provincial Standings</h2>
+<div class="checkbox">
+        <label>
+            <input ng-model="showOverall" type="checkbox" id="showOverall">Show Overall Record</label>
+    </div>
+  
+</div>
 <h3>Association Leaders</h3>
 <table class="table standingstable">
 <tr>
@@ -12,7 +18,6 @@
             <span style='font-size: 1.25em'>Games</span>
             </th>
         <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
-        <th class="centerText"><span style='font-size: 1.25em'>Qualifying</span></th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Points</span>
             </th>
@@ -30,9 +35,10 @@
     <tr  ng-repeat="team in divisionLeaders | orderBy:'winPct':true" ng-class="{missed: $index > 13 && predicate === 'points' && reverse === true, 'qualified': team.firstPlace}">
         <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
         <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
-        <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
-        <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
-        <td nowrap style='font-size: 1.25em' class="centerText">{{team.qualifyingWin}} - {{team.qualifyingLoss}} - {{team.qualifyingTie}}</td>
+        <td style='font-size: 1.25em' class="centerText" ng-show="!showOverall">{{team.qualifyingGames}}</td>
+        <td style='font-size: 1.25em' class="centerText" ng-show="showOverall">{{team.games}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText" ng-show="showOverall">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText" ng-show="!showOverall">{{team.qualifyingWin}} - {{team.qualifyingLoss}} - {{team.qualifyingTie}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.winPct}}</td>
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.oppWinPct}}</td>
@@ -41,6 +47,7 @@
 </table>
 
 <h3>Wildcard Standings</h3>
+
 <table class="table standingstable">
 <tr>
         <th class="centerText">
@@ -54,7 +61,6 @@
             <span style='font-size: 1.25em'>Games</span>
             <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
-        <th class="centerText"><span style='font-size: 1.25em'>Qualifying</span></th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Points</span>
             <span class="sortorder" ng-click="order('points')" ng-class="{reverse:reverse}"></span></th>
@@ -72,9 +78,10 @@
     <tr  ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 8 && predicate === 'winPct' && reverse === true}">
         <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
         <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
-        <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
-        <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
-        <td nowrap style='font-size: 1.25em' class="centerText">{{team.qualifyingWin}} - {{team.qualifyingLoss}} - {{team.qualifyingTie}}</td>
+        <td style='font-size: 1.25em' class="centerText" ng-show="!showOverall">{{team.qualifyingGames}}</td>
+        <td style='font-size: 1.25em' class="centerText" ng-show="showOverall">{{team.games}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText" ng-show="showOverall">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText" ng-show="!showOverall">{{team.qualifyingWin}} - {{team.qualifyingLoss}} - {{team.qualifyingTie}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.winPct}}</td>
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.oppWinPct}}</td>
