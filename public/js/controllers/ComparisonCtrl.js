@@ -100,6 +100,16 @@ var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonCon
     var getAllTeams = function() {
         Team.get().then(function(teams) {
 
+            teams.data.sort(function(a,b){
+                if (a.name < b.name){
+                    return -1;
+                } else if (a.name > b.name){
+                    return 1;
+                } else {
+                    return 0;
+                }
+                
+            });
             $scope.allTeams = teams.data;
 
 
