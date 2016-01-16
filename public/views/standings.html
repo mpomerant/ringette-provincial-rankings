@@ -12,6 +12,7 @@
             <span style='font-size: 1.25em'>Games</span>
             </th>
         <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
+        <th class="centerText"><span style='font-size: 1.25em'>Qualifying</span></th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Points</span>
             </th>
@@ -31,6 +32,7 @@
         <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
         <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText">{{team.qualifyingWin}} - {{team.qualifyingLoss}} - {{team.qualifyingTie}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.winPct}}</td>
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.oppWinPct}}</td>
@@ -52,6 +54,7 @@
             <span style='font-size: 1.25em'>Games</span>
             <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
         <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
+        <th class="centerText"><span style='font-size: 1.25em'>Qualifying</span></th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Points</span>
             <span class="sortorder" ng-click="order('points')" ng-class="{reverse:reverse}"></span></th>
@@ -71,6 +74,7 @@
         <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.games}}</td>
         <td nowrap style='font-size: 1.25em' class="centerText">{{team.win}} - {{team.loss}} - {{team.tie}}</td>
+        <td nowrap style='font-size: 1.25em' class="centerText">{{team.qualifyingWin}} - {{team.qualifyingLoss}} - {{team.qualifyingTie}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.points}}</td>
         <td style='font-size: 1.25em' class="centerText">{{team.winPct}}</td>
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.oppWinPct}}</td>

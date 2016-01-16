@@ -8,14 +8,7 @@
                     <option ng-repeat="team in allTeams" value="{{team.name}}">{{team.name}}</option>
                 </select>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Panel title</h3>
-                </div>
-                <div class="panel-body">
-                    {{team1Rating}}
-                </div>
-            </div>
+           
         </div>
         <div class="col col-sm-6">
             <div class="form-group">
@@ -24,15 +17,24 @@
                     <option ng-repeat="team in allTeams" value="{{team.name}}">{{team.name}}</option>
                 </select>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Panel title</h3>
-                </div>
-                <div class="panel-body">
-                    {{team2Rating}}
-                </div>
-            </div>
+
+            
         </div>
+
     </div>
+    <div class="row" ng-repeat="row in rows">
+        <div class="col col-sm-5 circle-container">
+            <compare-data data-title="{{row.name}}" data-css="{{row.getStatClass().team1}}" data-content="{{row.left}}" data-vs="{{row.right}}"></compare-data>
+        </div>
+        <div class="col col-sm-2 circle-container">
+        {{row.name}}
+        </div>
+        <div class="col col-sm-5 circle-container">
+            <compare-data data-title="{{row.name}}" data-css="{{row.getStatClass().team2}}" data-content="{{row.right}}" data-vs="{{row.left}}"></compare-data>
+        </div>
+
+    </div>
+    
+
     
 </form>

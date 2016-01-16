@@ -1,13 +1,67 @@
-angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonController', function($scope, Team) {
+var m = angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonController', function($scope, Team) {
 
 
     $scope.allTeams;
     $scope.team1;
     $scope.team1Data;
+    $scope.team1Win;
+    $scope.team1Loss;
+    $scope.team1Tie;
+    $scope.team1WinPct;
+    $scope.team1For;
+    $scope.team1Against;
+
     $scope.team2;
     $scope.team2Data;
     $scope.team1Rating;
     $scope.team2Rating;
+
+    var Stat = function(name, left, right, high){
+        var self = this;
+        self.name = name;
+        self.left = left;
+        self.right = right;
+        self.high = false;
+        self.getStatClass = function(){
+            var team1 = 'circle-normal';
+            var team2 = 'circle-normal';
+            if (self.left && self.right){
+                if (self.left > self.right){
+                    if (high){
+                        team1 = 'circle-green';
+                        team2 = 'circle-red';
+                    } else {
+                        team1 = 'circle-red';
+                        team2 = 'circle-green';
+                    }
+                } else if (self.left < self.right){
+                    if (high){
+                        team1 = 'circle-red';
+                        team2 = 'circle-green';
+                    } else {
+                        team1 = 'circle-green';
+                        team2 = 'circle-red';
+                    }
+                } 
+            }
+            
+            return {
+                team1: team1,
+                team2: team2
+            }
+
+        }
+    }
+
+    $scope.rows = [
+        new Stat('Rating', $scope.team1Rating, $scope.team2Rating, true),
+        new Stat('Win %', $scope.team1WinPct, $scope.team2WinPct, true),
+        new Stat('Goals For', $scope.team1WinPct, $scope.team2WinPct, true),
+        new Stat('Goals Against', $scope.team1WinPct, $scope.team2WinPct, false),
+
+       
+
+    ]
 
 
     var expectedScore = function(diff) {
@@ -67,6 +121,19 @@ angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonController'
 
             $scope.team1Data = teams.data;
             $scope.team1Rating = $scope.ratingData[$scope.team1].rating;
+            $scope.team1Win = teams.data.record.win + teams.data.regularSeasonRecord.win;
+            $scope.team1Loss = teams.data.record.loss + teams.data.regularSeasonRecord.loss;
+            $scope.team1Tie = teams.data.record.tie + teams.data.regularSeasonRecord.tie;
+    //$scope.team1Loss;
+    //$scope.team1Tie;
+    //$scope.team1WinPct;
+            $scope.team1For = teams.data.record.for + teams.data.regularSeasonRecord.for;
+            $scope.team1Against = teams.data.record.against + teams.data.regularSeasonRecord.against;
+            $scope.team1WinPct = teams.data.record.pct;
+            $scope.rows[0].left = $scope.team1Rating;
+            $scope.rows[1].left = $scope.team1WinPct;
+            $scope.rows[2].left = $scope.team1For;
+            $scope.rows[3].left = $scope.team1Against;
             calculateDiff();
 
         }, function(err) {
@@ -80,6 +147,16 @@ angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonController'
 
             $scope.team2Data = teams.data;
             $scope.team2Rating = $scope.ratingData[$scope.team2].rating;
+            $scope.team2Win = teams.data.record.win + teams.data.regularSeasonRecord.win;
+            $scope.team2Loss = teams.data.record.loss + teams.data.regularSeasonRecord.loss;
+            $scope.team2Tie = teams.data.record.tie + teams.data.regularSeasonRecord.tie;
+            $scope.team2WinPct = teams.data.record.pct;
+            $scope.team2For = teams.data.record.for + teams.data.regularSeasonRecord.for;
+            $scope.team2Against = teams.data.record.against + teams.data.regularSeasonRecord.against;
+            $scope.rows[0].right = $scope.team2Rating;
+            $scope.rows[1].right = $scope.team2WinPct;
+            $scope.rows[2].right = $scope.team2For;
+            $scope.rows[3].right = $scope.team2Against;
             calculateDiff();
 
         }, function(err) {
@@ -98,4 +175,27 @@ angular.module('ComparisonCtrl', ['chart.js']).controller('ComparisonController'
 
 
 
+});
+
+
+m.directive("compareData", function() {
+    return {
+
+        template: "<div class=\"circle {{css}}\"><span class=\"circle-content\">{{content}}</span></div>",
+        /**template: "<div class=\"panel panel-default\">" +
+                "<div class=\"panel-heading\">"+
+                    "<h3 class=\"panel-title\">{{title}}</h3>"+
+                "</div>"+
+                "<div class=\"panel-body\" ng-class=\"content > vs ? 'qualified' : 'missed'\">"+
+                    "{{content}}"+
+                "</div>"+
+            "</div>",**/
+        scope: {
+            title: "@title",
+            content: "@content",
+            vs: "@vs",
+            css: "@css"
+
+        }
+    };
 });

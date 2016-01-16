@@ -19,6 +19,9 @@ module.exports = function(app) {
             team: team,
             games: 0,
             qualifyingGames: 0,
+            qualifyingWin: 0,
+            qualifyingLoss: 0,
+            qualifyingTie: 0,
             win: 0,
             loss: 0,
             tie: 0,
@@ -340,6 +343,8 @@ module.exports = function(app) {
                             matrix[team1].win += 1;
                             if (result.type === 'RR' || result.type === 'SRR') {
                                 matrix[team1].points += 2;
+                                matrix[team1].qualifyingWin += 1;
+                                matrix[team2].qualifyingLoss += 1;
                             }
 
                             matrix[team2].loss += 1;
@@ -348,6 +353,8 @@ module.exports = function(app) {
                             matrix[team2].win += 1;
                             if (result.type === 'RR' || result.type === 'SRR') {
                                 matrix[team2].points += 2;
+                                matrix[team2].qualifyingWin += 1;
+                                matrix[team1].qualifyingLoss += 1;
                             }
                             matrix[team1].loss += 1;
 
@@ -360,6 +367,8 @@ module.exports = function(app) {
                             if (result.type === 'RR' || result.type === 'SRR') {
                                 matrix[team2].points += 1;
                                 matrix[team1].points += 1;
+                                matrix[team1].qualifyingTie += 1;
+                                matrix[team2].qualifyingTie += 1;
                             }
 
                         }
