@@ -15,9 +15,20 @@
             <label for="gameDate">Date:</label>
             <input type="dateTime" ng-model="game.gameDate" class="form-control" id="gameDate">
         </div>
+        <div class="form-group">
+            <label for="gameTypeSelect">Game Type:</label>
+            <select class="form-control" name="gameTypeSelect" id="gameTypeSelect" ng-model="game.type">
+                <option value="RS">Regular Season</option>
+                <option value="RR">Round Robin (Tournament)</option>
+                <option value="SRR">Split Round Robin (Tournament)</option>
+                <option value="GS">Final (Tournament)</option>
+                <option value="S1">Semi 1 (Tournament)</option>
+                <option value="S2">Semi 1 (Tournament)</option>
+            </select>
+        </div>
     </div>
     <div class="row">
-        <div class="col col-sm-6">
+        <div class="col col-sm-12 col-md-6">
             <div class="form-group">
                 <label for="team1select">Home:</label>
                 <select class="form-control" name="team1Select" id="team1select" ng-model="game.home">
@@ -25,11 +36,11 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="homeScore">Home:</label>
+                <label for="homeScore">Home Score:</label>
                 <input type="number" ng-model="game.homeScore" class="form-control" id="homeScore">
             </div>
         </div>
-        <div class="col col-sm-6">
+        <div class="col col-sm-12 col-md-6">
             <div class="form-group">
                 <label for="team2select">Visitor:</label>
                 <select class="form-control" name="team2Select" id="team2select" ng-model="game.visitor">
@@ -37,7 +48,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="visitorScore">Visitor:</label>
+                <label for="visitorScore">Visitor Score:</label>
                 <input type="number" ng-model="game.visitorScore" class="form-control" id="visitorScore">
             </div>
         </div>
