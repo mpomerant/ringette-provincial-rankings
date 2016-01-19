@@ -1,4 +1,4 @@
-angular.module('PowerRankCtrl', []).controller('PowerRankController', function($scope, $routeParams, Team) {
+angular.module('PowerRankCtrl', []).controller('PowerRankController', function($scope, $routeParams, Team,Ratings) {
     
 
     $scope.rankings;
@@ -8,10 +8,11 @@ angular.module('PowerRankCtrl', []).controller('PowerRankController', function($
 
     var getRankings = function() {
 
-        Team.rank().success(function(data) {
+        Ratings.get().then(function(data) {
             
             $scope.rankings = data.rating;
             $scope.eloTable = data.eloTable;
+            $scope.$apply();
             
         });
     }

@@ -446,7 +446,7 @@ module.exports = function(app) {
 
     app.post('/api/team', function(req, res) {
         var teams = req.body;
-        console.log('teams: ' + teams);
+        //console.log('teams: ' + teams);
         var teamModels = [];
         async.eachSeries(teams, function(team, callback) {
             Team.find({
@@ -457,7 +457,7 @@ module.exports = function(app) {
 
             }, function(err, existingTeams) {
                 if (!err) {
-                    console.log(JSON.stringify(existingTeams, null, 4));
+                    //console.log(JSON.stringify(existingTeams, null, 4));
                     if (existingTeams.length === 0) {
                         var teamModel = new Team({
                             name: team.name,
@@ -517,10 +517,10 @@ module.exports = function(app) {
 
         if (isDetail) {
             getTeamMatrix().then(function(result) {
-                console.log(result.matrix);
+                //console.log(result.matrix);
                 var output = [];
                 Object.getOwnPropertyNames(result.matrix).forEach(function(teamName) {
-                    console.log(teamName);
+                    //console.log(teamName);
                     var team = result.matrix[teamName];
                     var obj = {
                         team: team.team,
@@ -691,7 +691,7 @@ module.exports = function(app) {
             sortable.forEach(function(team, index) {
 
                 var association = team.association;
-                console.log('Team: ' + team.team + ' Association: ' + team.association);
+                //console.log('Team: ' + team.team + ' Association: ' + team.association);
 
                 if (!associations[association]) {
                     team.firstPlace = true;
@@ -798,42 +798,68 @@ module.exports = function(app) {
                 var homeScore = Number(game.homeScore);
                 var visitorScore = Number(game.visitorScore);
                 if (!elo[homeTeam]) {
-                    elo[homeTeam] = 1500;
+                    elo[homeTeam] = {
+                        score: 1500,
+                        games: [1500]
+                    };
+
                 }
 
                 if (!elo[visitorTeam]) {
-                    elo[visitorTeam] = 1500;
+                    elo[visitorTeam] = {
+                        score: 1500,
+                        games: [1500]
+                    };
                 }
 
-                var homeElo = elo[homeTeam];
-                var visitorElo = elo[visitorTeam];
+                var homeElo = elo[homeTeam].score;
+                var visitorElo = elo[visitorTeam].score;
 
 
                 var expected = eloDiff(homeElo, visitorElo);
                 var homeExpected = expected.a;
                 var visitorExpected = expected.b;
 
-                var C = game.type === 'RS' ? 30 : game.type === 'GS' ? 65 : game.type === 'S1' || game.type === 'S2' ? 55 : 50;
+                var C = game.type === 'RS' ? 15 : game.type === 'GS' ? 25 : game.type === 'S1' || game.type === 'S2' ? 25 : 20;
                 var eloHomeScore = 0;
                 var eloVisitorScore = 0;
+                var winner;
+                var loser;
                 if (homeScore > visitorScore) {
                     eloHomeScore = 1;
                     eloVisitorScore = 0;
+                    winner = homeElo;
+                    loser = visitorElo;
+
+
                 } else if (homeScore < visitorScore) {
                     eloHomeScore = 0;
                     eloVisitorScore = 1;
+                    winner = visitorElo;
+                    loser = homeElo;
                 } else {
                     eloHomeScore = 0.5;
                     eloVisitorScore = 0.5;
                 }
 
+                //LN(ABS(PD)+1) * (2.2/((ELOW-ELOL)*.001+2.2))
 
+
+
+                var multiplier = winner ? Math.log((Math.abs(homeScore - visitorScore) + 1) * (2.2 / (((winner - loser) * 0.001) + 2.2))) : 1;
+                //console.log('homeElo: ' + homeElo + ' visitorElo: ' + visitorElo + ' diff: ' + (homeScore - visitorScore) + ' multipler: ' + multiplier);
                 var newHomeElo = homeElo + (C * (eloHomeScore - homeExpected));
+                var homeDelta = (newHomeElo - homeElo) * multiplier;
+                newHomeElo = newHomeElo + homeDelta;
                 var newVisitorElo = visitorElo + (C * (eloVisitorScore - visitorExpected));
+                var visitorDelta = (newVisitorElo - visitorElo) * multiplier;
+                newVisitorElo = newVisitorElo + visitorDelta;
 
-                elo[homeTeam] = newHomeElo;
+                elo[homeTeam].score = newHomeElo;
+                elo[homeTeam].games.push(Number(newHomeElo).toFixed(0));
                 //console.log(homeTeam + ': ' + newHomeElo);
-                elo[visitorTeam] = newVisitorElo;
+                elo[visitorTeam].score = newVisitorElo;
+                elo[visitorTeam].games.push(Number(newVisitorElo).toFixed(0));
                 //console.log(visitorTeam + ': ' + newVisitorElo);
 
 
@@ -845,7 +871,8 @@ module.exports = function(app) {
 
                 eloArray.push({
                     team: team,
-                    rating: elo[team]
+                    rating: elo[team].score,
+                    games: elo[team].games
                 })
             }
 
@@ -870,7 +897,7 @@ module.exports = function(app) {
                 allTeams[team.name] = team;
             });
 
-            console.log(allTeams);
+            //console.log(allTeams);
             return allTeams;
         }).then(sortTeams).then(function(elo) {
             //console.log('printing: ' + JSON.stringify(elo, null, 4));

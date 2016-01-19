@@ -163,10 +163,24 @@ function getStCatherinesResults() {
 
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
-            var type = 'RR';
-            var status = 'Official';
             var number = Number(row.cells[0].innerText);
-            if ((type === 'RR' || type === 'SRR') && status === 'Official' && number < 78) {
+            var type = 'RR';
+            switch (number){
+                case 78:
+                    type = 'S1';
+                    break;
+                case 81:
+                    type = 'S2';
+                    break;
+                case 88:
+                    type = 'GS';
+                    break;
+                default:
+                    type = 'RR';
+            }
+            var status = 'Official';
+           
+           
                 var result = row.cells[4].innerText.split('-');
                 var home = row.cells[5].innerText;
                 var homeScore = result[1];
@@ -185,7 +199,7 @@ function getStCatherinesResults() {
                 job.gameDate = new Date('Nov 20 2015').toISOString();
                 jobs.push(job);
 
-            }
+            
 
         }
 

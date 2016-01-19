@@ -1,4 +1,4 @@
-var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($scope, $routeParams, Game) {
+var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($scope, $routeParams, Game, Ratings) {
 
 
     $scope.games;
@@ -15,21 +15,23 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
 
 
 
+
+
     var getGames = function() {
 
 
         Game.team($scope.teamId).success(function(data) {
             //console.log(JSON.stringify(data.regularSeason, null, 4));
-            var teamGames = data.games.map(function(game){
+            var teamGames = data.games.map(function(game) {
                 game.isPlayoff = game.type === 'GS' || game.type === 'S1' || game.type === 'S2'
                 return game;
             })
 
             data.games = teamGames;
 
-            
+
             $scope.games = data;
-            
+
             $scope.regularSeason = data.regularSeason;
             $scope.winPct = Number(data.record.pct).toFixed(3);
             $scope.oppWinPct = Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
@@ -44,7 +46,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
             $scope.forData = [$scope.averageGoalsFor, $scope.stats.totalAverageGoals]
             $scope.againstData = [$scope.averageGoalsAgainst, $scope.stats.totalAverageGoals]
 
-            
+
 
             $scope.statsForLabels = ['Goals For'];
             $scope.statsForSeries = [$scope.teamId, 'Average'];
@@ -172,62 +174,66 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
 
         })
 
-        
+
     }
     var populateGraph = function() {
+        //var elem = angular.element()
+        // var chartInstance = new Chart(document.querySelector('#line'));
         //console.log('populate Grapsh: ' + JSON.stringify($scope.regularSeason, null, 4));
-        $scope.labels = $scope.regularSeason.map(function(game, index, array) {
-            return 'Game ' + (index + 1);
-        });
-
-        $scope.series = [$scope.teamId];
-
-        var record = {
-            win: 0,
-            loss: 0,
-            tie: 0
-        }
-        var data = $scope.regularSeason.map(function(game, index, array) {
-            var team1 = game.home;
-            var team1Score = game.homeScore;
-            var team2 = game.visitor;
-            var team2Score = game.visitorScore;
-            var teamScore = team1 === $scope.teamId ? team1Score : team2Score;
-            var otherScore = team2 === $scope.teamId ? team1Score : team2Score;
-            var win = teamScore > otherScore ? 1 : 0;
-            var loss = teamScore < otherScore ? 1 : 0;
-            var tie = teamScore === otherScore ? 1 : 0;
-
-            record.win += win;
-            record.loss += loss;
-            record.tie += tie;
-
-            var pct = Number(((record.win * 2) + (record.tie)) / ((record.win + record.loss + record.tie) * 2)).toFixed(3);
+        var context = document.querySelector('#line').getContext('2d');
+        var chart = new Chart(context);
 
 
+        //$scope.data = [];
+        var ratings = Ratings.get().then(function(data) {
+            var ratingGames = data.rating.filter(function(rating) {
+                return rating.team === $scope.teamId;
+            });
 
-            return pct;
-        });
-        $scope.data = [data];
+            if (ratingGames.length > 0) {
+                $scope.data = ratingGames[0].games;
+                $scope.labels = $scope.data.map(function(game, index, array) {
+                    return 'Game ' + (index + 1);
+                });
+
+                $scope.series = [$scope.teamId];
+                var myData = {
+                    labels: $scope.labels,
+                    datasets: [{
+                        label: $scope.teamId,
+                        data: $scope.data
+                    }
+                    ]
+                }
+                chart.Line(myData, $scope.options);
+
+
+
+                //$scope.$apply();
+
+            }
+        })
 
         $scope.options = {
             // Boolean - If we want to override with a hard coded scale
-            scaleOverride: true,
+            scaleOverride: false,
 
             // ** Required if scaleOverride is true **
             // Number - The number of steps in a hard coded scale
-            scaleSteps: 10,
+            scaleSteps: 15,
             // Number - The value jump in the hard coded scale
-            scaleStepWidth: .1,
+            scaleStepWidth: 100,
             // Number - The scale starting value
-            scaleStartValue: 0,
+            scaleStartValue: 1000,
             //Boolean - Whether to fill the dataset with a colour
             datasetFill: false,
             //Number - Radius of each point dot in pixels
-            pointDotRadius: 8
+            pointDotRadius: 2
         }
 
-        console.log('data: ' + $scope.data);
+
+
+        //console.log('data: ' + $scope.data);
 
     }
 

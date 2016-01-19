@@ -1,4 +1,4 @@
-angular.module('StandingsRsCtrl', []).controller('StandingsRsController', function($scope, $routeParams, Game) {
+angular.module('StandingsRsCtrl', []).controller('StandingsRsController', function($scope, $routeParams, Game, Ratings) {
     
     $scope.association = $routeParams.association;
     

@@ -1,38 +1,36 @@
 <h2>U14A Provincial Standings</h2>
 <div class="checkbox">
-        <label>
-            <input ng-model="showOverall" type="checkbox" id="showOverall">Show Overall Record</label>
-    </div>
-  
+    <label>
+        <input ng-model="showOverall" type="checkbox" id="showOverall">Show Overall Record</label>
+</div>
 </div>
 <h3>Association Leaders</h3>
 <table class="table standingstable">
-<tr>
+    <tr>
         <th class="centerText">
             <span style='font-size: 1.25em'>Team</span>
-            </th>
+        </th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Association</span>
-            </th>
+        </th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Games</span>
-            </th>
+        </th>
         <th class="centerText"><span style='font-size: 1.25em'>Record</span></th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Points</span>
-            </th>
+        </th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Win %</span>
-            </th>
+        </th>
         <th class="centerText visible-lg">
             <span style='font-size: 1.25em'>Opp Win %</span>
-            </th>
+        </th>
         <th class="centerText visible-lg">
             <span style='font-size: 1.25em'>+/-</span>
-            </th>
+        </th>
     </tr>
-    
-    <tr  ng-repeat="team in divisionLeaders | orderBy:'winPct':true" ng-class="{missed: $index > 13 && predicate === 'points' && reverse === true, 'qualified': team.firstPlace}">
+    <tr ng-repeat="team in divisionLeaders | orderBy:'winPct':true" ng-class="{missed: $index > 13 && predicate === 'points' && reverse === true, 'qualified': team.firstPlace}">
         <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
         <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
         <td style='font-size: 1.25em' class="centerText" ng-show="!showOverall">{{team.qualifyingGames}}</td>
@@ -45,18 +43,15 @@
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.diff}}</td>
     </tr>
 </table>
-
 <h3>Wildcard Standings</h3>
-
 <table class="table standingstable">
-<tr>
+    <tr>
         <th class="centerText">
             <span style='font-size: 1.25em'>Team</span>
             <span class="sortorder" ng-click="order('team')" ng-class="{reverse:reverse}"></span></th>
-         <th class="centerText">
+        <th class="centerText">
             <span style='font-size: 1.25em'>Association</span>
-            </th>
-
+        </th>
         <th class="centerText">
             <span style='font-size: 1.25em'>Games</span>
             <span class="sortorder" ng-click="order('games')" ng-class="{reverse:reverse}"></span></th>
@@ -74,8 +69,7 @@
             <span style='font-size: 1.25em'>+/-</span>
             <span class="sortorder" ng-click="order('diff')" ng-class="{reverse:reverse}"></span></th>
     </tr>
-    
-    <tr  ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 8 && predicate === 'winPct' && reverse === true}">
+    <tr ng-repeat="team in standings | orderBy:predicate:reverse" ng-class="{missed: $index > 8 && predicate === 'winPct' && reverse === true}">
         <td style='font-size: 1.25em'><a ng-href="/team/{{team.team}}">{{team.team}}</a></td>
         <td style='font-size: 1.25em' class="centerText">{{team.association}}</td>
         <td style='font-size: 1.25em' class="centerText" ng-show="!showOverall">{{team.qualifyingGames}}</td>
@@ -88,3 +82,10 @@
         <td style='font-size: 1.25em' class="centerText visible-lg">{{team.diff}}</td>
     </tr>
 </table>
+<div class="row">
+    <div class="col-sm-12">
+        <h2>Season Power Ranking</h2>
+        <canvas id="line" class="chart chart-line" chart-options="options" chart-legend="false" chart-data="data" chart-labels="labels" chart-legend="'false'" chart-series="series" chart-options="options" chart-click="onClick">
+        </canvas>
+    </div>
+</div>

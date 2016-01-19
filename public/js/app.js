@@ -8,6 +8,7 @@ angular.module('sampleApp', [
     'StandingsRsCtrl',
     'GameService', 
     'TeamService',
+    'RatingService',
     'TeamAdminCtrl',
     'PowerRankCtrl',
     'ComparisonCtrl',

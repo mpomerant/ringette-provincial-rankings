@@ -55,6 +55,10 @@ angular.module('GameAdminCtrl', []).controller('GameAdminController', function($
         });
     }
 
+    $scope.setSelected = function(game) {
+        $scope.game = game;
+    }
+
     $scope.submit = function() {
         var submitGame = [$scope.game];
         Game.create(submitGame).success(function(data) {
