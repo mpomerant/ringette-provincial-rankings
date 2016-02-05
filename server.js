@@ -102,10 +102,10 @@ var fetchResults = function() {
     }
 }
 setInterval(function() {
-    fetchResults
+    fetchResults()
 
 }, 3600000);
-//fetchResults();
+fetchResults();
 
 // expose app
 exports = module.exports = app;
