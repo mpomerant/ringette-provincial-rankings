@@ -15,6 +15,7 @@
     <script src="libs/angular-route/angular-route.min.js"></script>
     <script src="libs/Chart.js/Chart.js"></script>
     <script src="libs/angular-chart.js/dist/angular-chart.js"></script>
+    <script src="libs/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <!-- ANGULAR CUSTOM -->
     <script src="js/controllers/MainCtrl.js"></script>
     <script src="js/controllers/GameCtrl.js"></script>
@@ -35,11 +36,41 @@
 <body ng-app="sampleApp">
     <div class="container">
         <!-- HEADER -->
-        <nav class="navbar navbar-inverse">
+        <nav class="navbar navbar-default" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Home</a>
+            </div>
+
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" ng-class="!navCollapsed && 'in'" ng-click="navCollapsed=true">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/standings">Standings</a></li>
+                    
+                    <li><a href="/standings/Eastern">Eastern</a></li>
+                    <li><a href="/standings/Western">Western</a></li>
+                    <li><a href="/standings/Central">Central</a></li>
+                    <li><a href="/standings/Southern">Southern</a></li>
+                    <li><a href="/standings/North East">North East</a></li>
+                    <li><a href="/games">Games</a></li>
+                    <li><a href="/ranking">Power Rankings</a></li>
+                    <li><a href="/teams/compare">Compare Teams</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+        <!--<nav class="navbar navbar-inverse">
             <div class="navbar-header">
                 <a class="navbar-brand" href="/">Home</a>
             </div>
-            <!-- LINK TO OUR PAGES. ANGULAR HANDLES THE ROUTING HERE -->
+            
             <ul class="nav navbar-nav">
                 <li><a href="/standings">Standings</a></li>
                 <li><a href="/standings/Eastern">Eastern</a></li>
@@ -51,7 +82,7 @@
                 <li><a href="/ranking">Power Rankings</a></li>
                 <li><a href="/teams/compare">Compare Teams</a></li>
             </ul>
-        </nav>
+        </nav>-->
         <!-- ANGULAR DYNAMIC CONTENT -->
         <div ng-view></div>
     </div>

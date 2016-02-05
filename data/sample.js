@@ -528,7 +528,27 @@ var tournaments = [{
         url: 'http://www.score2stats.com/20152016/RichmondHill3AAA6C25181748BB91EF983A52848EE1/New_S2S/Schedule.aspx',
         name: 'Richmond Hill',
         year: 2016
+    }, {
+        url: 'http://www.score2stats.com/20152016/GloucesterCumberlandB93714608D3049839CE31FD943E56D42/New_S2S/Schedule.aspx',
+        name: 'Gloucester Cumberland',
+        year: 2016
+    }, {
+        url: 'http://www.score2stats.com/20152016/WestOttawa1590A011F6AC4850A2C6D456E7011444/New_S2S/Schedule.aspx',
+        name: 'West Ottawa',
+        year: 2016
+    }, {
+        url: 'http://www.score2stats.com/20152016/GuelphA61D1F58D978413999B32A47B0B609D1/New_S2S/Schedule.aspx',
+        name: 'Guelph',
+        year: 2016
+    }, {
+        url: 'http://www.score2stats.com/20152016/NewmarketE3D432E23D1340589D591A3EF0250CE6/New_S2S/Schedule.aspx',
+        name: 'Newmarket',
+        year: 2016
     }
+
+
+
+    
 ];
 
 var associations = [{

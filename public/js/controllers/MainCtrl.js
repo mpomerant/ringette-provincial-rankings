@@ -1,4 +1,4 @@
-angular.module('MainCtrl', []).controller('MainController', function($scope, Team) {
+angular.module('MainCtrl', ['ui.bootstrap']).controller('MainController', function($scope, Team) {
 
  	$scope.westTeams;
  	$scope.centralTeams;

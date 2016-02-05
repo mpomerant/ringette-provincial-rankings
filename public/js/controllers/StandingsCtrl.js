@@ -1,4 +1,4 @@
-angular.module('StandingsCtrl', []).controller('StandingsController', function($scope, Game) {
+angular.module('StandingsCtrl', []).controller('StandingsController', function($scope, Game, Team, Ratings) {
 
     $scope.standings;
     $scope.divisionLeaders;
@@ -36,10 +36,11 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
             });
             $scope.standings.forEach(function(team) {
                 var teamId = team.team;
-                Game.team(teamId).success(function(data) {
+                Team.team(teamId).then(function(data) {
                     //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
                     team.oppWinPct =
                         Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
+                        $scope.$apply();
 
                 });
             });
@@ -49,10 +50,11 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
             });
             $scope.divisionLeaders.forEach(function(team) {
                 var teamId = team.team;
-                Game.team(teamId).success(function(data) {
+                Team.team(teamId).then(function(data) {
                     //var tournamentTeam = (data.opponentRecord.win !== 0 && data.oppenentRecord.loss !== 0);
                     team.oppWinPct =
                         Number(data.opponentRecord.points / (data.opponentRecord.games * 2)).toFixed(3);
+                     $scope.$apply();
 
                 });
 
@@ -62,7 +64,35 @@ angular.module('StandingsCtrl', []).controller('StandingsController', function($
         });
     }
 
+    var getRatings = function(){
+        Ratings.composite().then(function(ratings){
+            var context = document.querySelector('#line').getContext('2d');
+            var chart = new Chart(context);
+            var lineChart = chart.Line(ratings, $scope.options);
+            document.getElementById('js-legend').innerHTML = lineChart.generateLegend();
+            //lineChart.generateLegend();
+        })
+    }
+
+    $scope.options = {
+            // Boolean - If we want to override with a hard coded scale
+            scaleOverride: false,
+
+            // ** Required if scaleOverride is true **
+            // Number - The number of steps in a hard coded scale
+            scaleSteps: 15,
+            // Number - The value jump in the hard coded scale
+            scaleStepWidth: 100,
+            // Number - The scale starting value
+            scaleStartValue: 1000,
+            //Boolean - Whether to fill the dataset with a colour
+            datasetFill: false,
+            //Number - Radius of each point dot in pixels
+            pointDotRadius: 2
+        }
+
     getStandings();
+    //getRatings();
 
 
     $scope.order = function(predicate) {

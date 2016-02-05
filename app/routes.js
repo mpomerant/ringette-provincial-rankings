@@ -792,6 +792,7 @@ module.exports = function(app) {
         return getAllGames().then(function(games) {
             var elo = {};
             console.log('games: ' + games.length);
+
             games.forEach(function(game) {
                 var homeTeam = game.home;
                 var visitorTeam = game.visitor;
@@ -800,7 +801,7 @@ module.exports = function(app) {
                 if (!elo[homeTeam]) {
                     elo[homeTeam] = {
                         score: 1500,
-                        games: [1500]
+                        games: []
                     };
 
                 }
@@ -808,7 +809,7 @@ module.exports = function(app) {
                 if (!elo[visitorTeam]) {
                     elo[visitorTeam] = {
                         score: 1500,
-                        games: [1500]
+                        games: []
                     };
                 }
 
@@ -856,10 +857,19 @@ module.exports = function(app) {
                 newVisitorElo = newVisitorElo + visitorDelta;
 
                 elo[homeTeam].score = newHomeElo;
-                elo[homeTeam].games.push(Number(newHomeElo).toFixed(0));
+                var homeGame = {
+                    score: Number(newHomeElo).toFixed(0),
+                    date: game.gameDate
+                }
+                elo[homeTeam].games.push(homeGame);
+
                 //console.log(homeTeam + ': ' + newHomeElo);
                 elo[visitorTeam].score = newVisitorElo;
-                elo[visitorTeam].games.push(Number(newVisitorElo).toFixed(0));
+                var visitorGame = {
+                    score: Number(newVisitorElo).toFixed(0),
+                    date: game.gameDate
+                }
+                elo[visitorTeam].games.push(visitorGame);
                 //console.log(visitorTeam + ': ' + newVisitorElo);
 
 

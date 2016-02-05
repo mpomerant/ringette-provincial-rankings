@@ -1,4 +1,4 @@
-var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($scope, $routeParams, Game, Ratings) {
+var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', function($scope, $routeParams, Team, Ratings) {
 
 
     $scope.games;
@@ -20,7 +20,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
     var getGames = function() {
 
 
-        Game.team($scope.teamId).success(function(data) {
+        Team.team($scope.teamId).then(function(data) {
             //console.log(JSON.stringify(data.regularSeason, null, 4));
             var teamGames = data.games.map(function(game) {
                 game.isPlayoff = game.type === 'GS' || game.type === 'S1' || game.type === 'S2'
@@ -111,6 +111,7 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
             }
             populateGraph();
             populateMatrix();
+            $scope.$apply();
         });
     }
     var MatrixTeam = function(name) {
@@ -201,7 +202,9 @@ var m = angular.module('TeamCtrl', ['chart.js']).controller('TeamController', fu
                     labels: $scope.labels,
                     datasets: [{
                         label: $scope.teamId,
-                        data: $scope.data
+                        data: $scope.data.map(function(game){
+                            return game.score;
+                        })
                     }
                     ]
                 }

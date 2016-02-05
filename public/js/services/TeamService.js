@@ -1,33 +1,37 @@
 angular.module('TeamService', []).factory('Team', ['$http', function($http) {
+        var teams = {};
 
-    return {
-
-        rank: function(){
-            return $http.get('/api/ratings');
-        },
-
-        team: function(id) {
-            return $http.get('/api/team/' + id);
-        },
-        
-
-        
-        // call to get all teams
-        get: function() {
-            return $http.get('/api/team');
-        },
+        teams.data = {};
 
 
-        // these will work when more API routes are defined on the Node side of things
-        // call to POST and create a new nerd
-        create: function(teamData) {
-            return $http.post('/api/team', teamData);
-        },
+        teams.team = function(id) {
+            return new Promise(function(resolve, reject) {
+                if (teams.data[id]) {
+                    resolve(teams.data[id]);
+                } else {
 
-        // call to DELETE a nerd
-        delete: function(id) {
-            return $http.delete('/api/team/' + id);
+                    $http.get('/api/team/' + id).success(function(data) {
+                        teams.data[id] = data;
+                        resolve(teams.data[id]);
+
+
+                    });
+                }
+            });
+
         }
+
+        teams.get = function() {
+            return $http.get('/api/team');
+        };
+
+        teams.create = function() {
+            return $http.post('/api/team', teamData);
+        };
+        teams.delete = function(id) {
+            return $http.delete('/api/team/' + id);
+        };
+        return teams
     }
 
-}]);
+]);
