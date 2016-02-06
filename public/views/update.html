@@ -1,0 +1,31 @@
+<button type="button" class="btn btn-default" ng-click="update()">Update</button>
+<h2>Logs</h2>
+<table class="table table-bordered table-striped">
+    <tr>
+        <th style="width: 20%">Date</th>
+        <th style="width: 20%">Severity</th>
+        <th style="width: 20%">Message</th>
+    </tr>
+    <tr ng-repeat="log in pagedLogs | orderBy:'date'">
+        <td <style="width: 20%; font-size: 1.25em" ng-bind="log.date | date:'MMM dd yyyy HH:mm:ss'"></td>
+        <td style="width: 20%">{{log.severity}}</td>
+        <td style="width: 60%">{{log.message}}</td>
+    </tr>
+    <tfoot>
+        <td colspan="6">
+            <div>
+                <ul class="pagination pull-right">
+                    <li ng-class="{disabled: currentPage == 0}">
+                        <a href ng-click="prevPage()">« Prev</a>
+                    </li>
+                    <li ng-repeat="n in range(totalPages, currentPage, currentPage + gap) " ng-class="{active: n == currentPage}" ng-click="setPage()">
+                        <a href ng-bind="n + 1">1</a>
+                    </li>
+                    <li ng-class="{disabled: (currentPage) == totalPages - 1}">
+                        <a href ng-click="nextPage()">Next »</a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tfoot>
+</table>

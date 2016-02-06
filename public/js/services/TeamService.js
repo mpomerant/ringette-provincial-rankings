@@ -1,4 +1,5 @@
 angular.module('TeamService', []).factory('Team', ['$http', function($http) {
+
         var teams = {};
 
         teams.data = {};

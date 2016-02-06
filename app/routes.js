@@ -2,12 +2,18 @@ var Game = require('./models/gameResult');
 var Team = require('./models/team');
 var models = require('./models/standings')();
 var Ratings = require('./models/ratings');
+var Log = require('./models/log');
 var path = require('path');
 var async = require('async');
+var exec = require('child_process');
 module.exports = function(app) {
     'use strict';
 
+    //configure websockets
+    var server = require('http').Server(app);
+    var io = require('socket.io')(server);
 
+    server.listen(9999);
     // server routes ===========================================================
     // handle things like api calls
     // authentication routes
@@ -935,6 +941,33 @@ module.exports = function(app) {
     });
 
     // sample api route
+    app.get('/api/logs', function(req, res) {
+        // use mongoose to get all games in the 
+        var offset = req.query.offset;
+        var size = req.query.size;
+        console.log('offset: ' + offset + ' size: ' + size);
+
+        Log.count({}, function(err, c) {
+            console.log('Count is ' + c);
+            Log.find({}).skip(offset).limit(size).sort({
+                date: 'desc'
+            }).exec(function(err, logs) {
+                // if there is an error retrieving, send the error.
+                // nothing after res.send(err) will execute
+                if (err) {
+                    res.send(err);
+                }
+                var obj = {};
+                obj.logs = logs;
+                obj.count = c;
+                res.json(obj); // return all games in JSON format
+            });
+        });
+
+
+    });
+
+    // sample api route
     app.get('/api/games', function(req, res) {
         // use mongoose to get all games in the 
         Game.find({}).sort({
@@ -1015,6 +1048,40 @@ module.exports = function(app) {
 
     }
 
+    app.running = false;
+    app.fetchResults = function() {
+        return new Promise(function(resolve, reject) {
+            var cmd = 'casperjs sample.js';
+            if (!app.running) {
+                app.running = true;
+                console.log('trying to run');
+                exec.exec(cmd, {
+                    cwd: 'data',
+                    encoding: 'utf8',
+                    timeout: 45000,
+                    maxBuffer: 200 * 1024,
+                    killSignal: 'SIGTERM',
+
+                    env: null
+
+                }, function(error, stdout, stderr) {
+                    console.log('output: ' + stdout);
+                    resolve('fetch completed');
+                    if (stderr) {
+                        reject('fetch failed: ' + stderr);
+                        //console.log('error: ' + stderr);
+                    }
+
+                    app.running = false;
+                });
+            } else {
+                resolve('already running');
+                console.log('already running');
+            }
+        });
+
+    };
+
     app.addGames = function(games) {
         return new Promise(function(resolve, reject) {
             //console.log('post: ' + JSON.stringify(games, null, 4));
@@ -1047,6 +1114,57 @@ module.exports = function(app) {
         })
 
     }
+
+    var logMessage = function(severity, message) {
+        return new Promise(function(resolve, reject) {
+            console.log('here I am');
+            var logModel = new Log({
+
+                date: new Date(),
+                message: message,
+                severity: severity
+            });
+            logModel.save(function(doc) {
+                console.log('saved: ' + doc);
+                resolve(doc);
+                //do nothing
+            }, function(err) {
+                reject(err);
+
+            });
+        });
+
+    }
+
+    var log = {
+        error: function(message) {
+            return logMessage('ERROR', message);
+        },
+        warn: function(message) {
+            return logMessage('WARN', message);
+        },
+        info: function(message) {
+            return logMessage('INFO', message);
+        },
+    }
+
+
+    app.post('/api/transaction', function(req, res) {
+        var tans = req.body;
+        console.log('hello');
+        log.info('fetch requested ' + new Date());
+        app.fetchResults().then(function(message) {
+            log.info('fetch completed ' + new Date());
+            res.json('fetch completed');
+        }).catch(function(err) {
+            log.error('fetch failed ' + err);
+            res.json('fetch failed');
+        });
+
+
+
+
+    });
     app.post('/api/games', function(req, res) {
         var games = req.body;
         app.addGames(games).then(function(gameModels) {

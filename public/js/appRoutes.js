@@ -51,6 +51,12 @@
      .when('/standings', {
          templateUrl: 'views/standings.html',
          controller: 'StandingsController'
+     })
+
+     // standings page that will use the StandingsController
+     .when('/admin/update', {
+         templateUrl: 'views/update.html',
+         controller: 'UpdateController'
      });
 
     

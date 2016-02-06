@@ -11,7 +11,8 @@
     "node-schedule": "^0.6.0",
     "passport": "^0.3.2",
     "phantomjs": "^1.9.19",
-    "promise": "^7.1.1"
+    "promise": "^7.1.1",
+    "socket.io": "^1.4.5"
   },
   "eslintConfig": {
     "env": {

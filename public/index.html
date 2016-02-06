@@ -26,9 +26,11 @@
     <script src="js/controllers/TeamAdminCtrl.js"></script>
     <script src="js/controllers/PowerRankingsCtrl.js"></script>
     <script src="js/controllers/ComparisonCtrl.js"></script>
+    <script src="js/controllers/UpdateCtrl.js"></script>
     <script src="js/services/GameService.js"></script>
     <script src="js/services/TeamService.js"></script>
     <script src="js/services/RatingService.js"></script>
+    <script src="js/services/LogService.js"></script>
     <script src="js/appRoutes.js"></script>
     <script src="js/app.js"></script>
 </head>
@@ -47,13 +49,10 @@
                 </button>
                 <a class="navbar-brand" href="/">Home</a>
             </div>
-
-
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" ng-class="!navCollapsed && 'in'" ng-click="navCollapsed=true">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/standings">Standings</a></li>
-                    
                     <li><a href="/standings/Eastern">Eastern</a></li>
                     <li><a href="/standings/Western">Western</a></li>
                     <li><a href="/standings/Central">Central</a></li>

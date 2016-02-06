@@ -8,11 +8,13 @@ angular.module('sampleApp', [
     'StandingsRsCtrl',
     'GameService', 
     'TeamService',
+    'LogService',
     'RatingService',
     'TeamAdminCtrl',
     'PowerRankCtrl',
     'ComparisonCtrl',
     'GameAdminCtrl',
+    'UpdateCtrl',
     'chart.js',
     'ui.bootstrap'
 ]);

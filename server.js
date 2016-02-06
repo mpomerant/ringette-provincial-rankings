@@ -75,37 +75,12 @@ fs.watchFile(path.join(__dirname, 'data/output/gameResults.json'), function(curr
     
 });
 var running = false;
-var fetchResults = function() {
-    console.log('parsing');
-    var cmd = 'casperjs sample.js';
-    if (!running) {
-        running = true;
-        exec.exec(cmd, {
-            cwd: 'data',
-            encoding: 'utf8',
-            timeout: 45000,
-            maxBuffer: 200 * 1024,
-            killSignal: 'SIGTERM',
 
-            env: null
-
-        }, function(error, stdout, stderr) {
-            console.log('output: ' + stdout);
-            if (stderr) {
-                console.log('error: ' + stderr);
-            }
-
-            running = false;
-        });
-    } else {
-        console.log('already running');
-    }
-}
 setInterval(function() {
-    fetchResults()
+    app.fetchResults()
 
 }, 3600000);
-fetchResults();
+//app.fetchResults();
 
 // expose app
 exports = module.exports = app;
