@@ -22,7 +22,9 @@ angular.module('GameService', []).factory('Game', ['$http', function($http) {
         get: function() {
             return $http.get('/api/games');
         },
-
+        update: function(gameData) {
+            return $http.put('/api/games/' + gameData['_id'] , gameData);
+        },
 
         // these will work when more API routes are defined on the Node side of things
         // call to POST and create a new nerd

@@ -1165,6 +1165,20 @@ module.exports = function(app) {
 
 
     });
+
+    app.put('/api/games/:id', function(req, res) {
+        var id = req.params.id;
+        var game = req.body;
+        var gameModel = new Game(game);
+        gameModel.update(function(doc) {
+            res.json(gameModel);
+        }, function(err) {
+            res.status(500).json(err);
+            
+        });
+
+    });
+
     app.post('/api/games', function(req, res) {
         var games = req.body;
         app.addGames(games).then(function(gameModels) {

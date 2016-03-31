@@ -1,20 +1,20 @@
 angular.module('GameAdminCtrl', []).controller('GameAdminController', function($scope, Game, Team) {
-	$scope.allTeams;
+    $scope.allTeams;
     $scope.games;
 
 
     var getAllTeams = function() {
         Team.get().then(function(teams) {
 
-            teams.data.sort(function(a,b){
-                if (a.name < b.name){
+            teams.data.sort(function(a, b) {
+                if (a.name < b.name) {
                     return -1;
-                } else if (a.name > b.name){
+                } else if (a.name > b.name) {
                     return 1;
                 } else {
                     return 0;
                 }
-                
+
             });
             $scope.allTeams = teams.data;
 
@@ -60,14 +60,25 @@ angular.module('GameAdminCtrl', []).controller('GameAdminController', function($
     }
 
     $scope.submit = function() {
-        var submitGame = [$scope.game];
-        Game.create(submitGame).success(function(data) {
-            if (data.length) {
-                $scope.games.push(data[0]);
-                $scope.game = initGame();
-            }
+        if ($scope.game['_id']) {
+            Game.update($scope.game).success(function(data) {
+                if (data.length) {
+                    
+                    $scope.game = initGame();
+                }
 
-        });
+            });
+        } else {
+            var submitGame = [$scope.game];
+            Game.create(submitGame).success(function(data) {
+                if (data.length) {
+                    $scope.games.push(data[0]);
+                    $scope.game = initGame();
+                }
+
+            });
+        }
+
     }
 
     getAllTeams();
